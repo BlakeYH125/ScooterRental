@@ -1,6 +1,7 @@
 package org.scooterrental.model.entity;
 
 import jakarta.persistence.*;
+import org.scooterrental.model.eums.TripStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,40 +16,45 @@ public class Trip {
     private Long tripId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "scooter_id")
+    @JoinColumn(name = "scooter_id", nullable = false)
     private Scooter scooter;
 
+    @Column(name = "trip_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TripStatus tripStatus = TripStatus.ACTIVE;
+
     @ManyToOne
-    @JoinColumn(name = "start_point_id")
+    @JoinColumn(name = "start_point_id", nullable = false)
     private RentalPoint startPoint;
 
     @ManyToOne
     @JoinColumn(name = "end_point_id")
     private RentalPoint endPoint;
 
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
-    @Column(name = "total_cost")
-    private BigDecimal totalCost;
+    @Column(name = "total_cost", nullable = false)
+    private BigDecimal totalCost = BigDecimal.ZERO;
 
     @ManyToOne
-    @JoinColumn(name = "tariff_id")
+    @JoinColumn(name = "tariff_id", nullable = false)
     private Tariff tariff;
 
     public Trip() {
     }
 
-    public Trip(User user, Scooter scooter, RentalPoint startPoint, RentalPoint endPoint, LocalDateTime startTime, LocalDateTime endTime, BigDecimal totalCost, Tariff tariff) {
+    public Trip(User user, Scooter scooter, TripStatus tripStatus, RentalPoint startPoint, RentalPoint endPoint, LocalDateTime startTime, LocalDateTime endTime, BigDecimal totalCost, Tariff tariff) {
         this.user = user;
         this.scooter = scooter;
+        this.tripStatus = tripStatus;
         this.startPoint = startPoint;
         this.endPoint = endPoint;
         this.startTime = startTime;
@@ -79,6 +85,14 @@ public class Trip {
 
     public void setScooter(Scooter scooter) {
         this.scooter = scooter;
+    }
+
+    public TripStatus getTripStatus() {
+        return tripStatus;
+    }
+
+    public void setTripStatus(TripStatus tripStatus) {
+        this.tripStatus = tripStatus;
     }
 
     public RentalPoint getStartPoint() {

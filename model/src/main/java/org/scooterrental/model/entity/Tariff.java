@@ -14,15 +14,15 @@ public class Tariff {
     @Column(name = "tariff_id")
     private Long tariffId;
 
-    @Column
+    @Column(name = "payment_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
-    @Column(name = "price")
-    private BigDecimal price;
+    @Column(name = "price", nullable = false)
+    private BigDecimal price = BigDecimal.ZERO;
 
-    @Column(name = "discount")
-    private int discount;
+    @Column(name = "discount", nullable = false)
+    private int discount = 0;
 
     public Tariff() {
     }

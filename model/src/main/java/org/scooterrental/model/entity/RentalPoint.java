@@ -11,7 +11,7 @@ public class RentalPoint {
     @Column(name = "rental_point_id")
     private Long rentalPointId;
 
-    @Column(name = "location")
+    @Column(name = "location", nullable = false)
     private String location;
 
     @ManyToOne
@@ -26,7 +26,7 @@ public class RentalPoint {
         this.parentPoint = parentPoint;
     }
 
-    public Long getRentalPoint() {
+    public Long getRentalPointId() {
         return rentalPointId;
     }
 

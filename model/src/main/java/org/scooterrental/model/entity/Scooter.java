@@ -12,18 +12,18 @@ public class Scooter {
     @Column(name = "scooter_id")
     private Long scooterId;
 
-    @Column(name = "model")
+    @Column(name = "model", nullable = false)
     private String model;
 
-    @Column(name = "battery_level")
+    @Column(name = "battery_level", nullable = false)
     private int batteryLevel;
 
-    @Column(name = "scooter_status")
+    @Column(name = "scooter_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private ScooterStatus scooterStatus;
 
     @ManyToOne
-    @JoinColumn(name = "rental_point_id")
+    @JoinColumn(name = "rental_point_id", nullable = false)
     private RentalPoint rentalPoint;
 
     public Scooter() {
