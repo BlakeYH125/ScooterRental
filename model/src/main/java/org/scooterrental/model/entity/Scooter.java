@@ -16,15 +16,15 @@ public class Scooter {
     private String model;
 
     @Column(name = "battery_level", nullable = false)
-    private int batteryLevel;
+    private int batteryLevel = 100;
 
     @Column(name = "scooter_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ScooterStatus scooterStatus;
+    private ScooterStatus scooterStatus = ScooterStatus.IN_WAREHOUSE;
 
     @ManyToOne
-    @JoinColumn(name = "rental_point_id", nullable = false)
-    private RentalPoint rentalPoint;
+    @JoinColumn(name = "rental_point_id")
+    private RentalPoint rentalPoint = null;
 
     public Scooter() {
     }
