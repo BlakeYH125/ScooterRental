@@ -9,7 +9,7 @@ public class UserCreateDto {
 
     private String lastName;
 
-    private String age;
+    private int age;
 
     public UserCreateDto() {
     }
@@ -46,11 +46,11 @@ public class UserCreateDto {
         this.lastName = lastName;
     }
 
-    public String getAge() {
+    public int getAge() {
         return age;
     }
 
-    public void setAge(String age) {
+    public void setAge(int age) {
         this.age = age;
     }
 }

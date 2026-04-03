@@ -9,9 +9,9 @@ import org.scooterrental.service.dto.RentalPointResponseDto;
 @Mapper(componentModel = "spring")
 public interface RentalPointMapper {
 
-    @Mapping(source = "parentPoint.parentPointId", target = "parentPointId")
+    @Mapping(source = "parentPoint.rentalPointId", target = "parentPointId")
     RentalPointResponseDto toRentalPointDto(RentalPoint rentalPoint);
 
-    @Mapping(source = "parentPoint", target = "parent")
-    RentalPoint toRentalPointEntity(RentalPointCreateDto rentalPointCreateDto);
+    @Mapping(source = "parentPoint", target = "parentPoint")
+    RentalPoint toRentalPointEntity(RentalPointCreateDto rentalPointCreateDto, RentalPoint parentPoint);
 }
