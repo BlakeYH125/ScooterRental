@@ -1,7 +1,14 @@
 package org.scooterrental.service.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 public class RentalPointCreateDto {
+
+    @NotBlank(message = "Локация обязательная")
     private String location;
+
+    @Positive(message = "ID родительской точки должен быть больше 0")
     private Long parentPointId;
 
     public RentalPointCreateDto() {
