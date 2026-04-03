@@ -8,6 +8,7 @@ import org.scooterrental.service.dto.ScooterResponseDto;
 
 @Mapper(componentModel = "spring")
 public interface ScooterMapper {
+
     @Mapping(source = "rentalPoint.rentalPointId", target = "rentalPointId")
     ScooterResponseDto toScooterDto(Scooter scooter);
 
