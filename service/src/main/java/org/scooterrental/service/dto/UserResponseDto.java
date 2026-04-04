@@ -1,6 +1,6 @@
 package org.scooterrental.service.dto;
 
-import org.scooterrental.model.eums.Role;
+import org.scooterrental.model.enums.Role;
 
 import java.math.BigDecimal;
 

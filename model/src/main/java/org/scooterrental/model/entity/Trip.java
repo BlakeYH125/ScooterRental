@@ -1,7 +1,7 @@
 package org.scooterrental.model.entity;
 
 import jakarta.persistence.*;
-import org.scooterrental.model.eums.TripStatus;
+import org.scooterrental.model.enums.TripStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

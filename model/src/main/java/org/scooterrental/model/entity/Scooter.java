@@ -1,7 +1,7 @@
 package org.scooterrental.model.entity;
 
 import jakarta.persistence.*;
-import org.scooterrental.model.eums.ScooterStatus;
+import org.scooterrental.model.enums.ScooterStatus;
 
 @Entity
 @Table(name = "scooters")

@@ -1,7 +1,7 @@
 package org.scooterrental.model.entity;
 
 import jakarta.persistence.*;
-import org.scooterrental.model.eums.PaymentType;
+import org.scooterrental.model.enums.PaymentType;
 
 import java.math.BigDecimal;
 
