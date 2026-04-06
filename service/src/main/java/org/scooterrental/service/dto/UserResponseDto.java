@@ -19,7 +19,7 @@ public class UserResponseDto {
 
     private Role role;
 
-    private boolean banned;
+    private String banReason;
 
     public UserResponseDto() {
     }
@@ -80,11 +80,11 @@ public class UserResponseDto {
         this.role = role;
     }
 
-    public boolean isBanned() {
-        return banned;
+    public String getBanReason() {
+        return banReason;
     }
 
-    public void setBanned(boolean banned) {
-        this.banned = banned;
+    public void setBanReason(String banReason) {
+        this.banReason = banReason;
     }
 }

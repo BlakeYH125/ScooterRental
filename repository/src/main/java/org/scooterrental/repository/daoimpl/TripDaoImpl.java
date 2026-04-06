@@ -2,6 +2,7 @@ package org.scooterrental.repository.daoimpl;
 
 import org.hibernate.SessionFactory;
 import org.scooterrental.model.entity.Trip;
+import org.scooterrental.model.enums.TripStatus;
 import org.scooterrental.repository.daointerface.TripDao;
 import org.springframework.stereotype.Repository;
 
@@ -33,5 +34,14 @@ public class TripDaoImpl implements TripDao {
     @Override
     public List<Trip> findTrips() {
         return sessionFactory.getCurrentSession().createQuery("FROM Trip", Trip.class).list();
+    }
+
+    @Override
+    public boolean isThereActiveTripByUserId(Long userId) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT COUNT(t) FROM Trip t WHERE user.userId = :userId AND t.tripStatus = :tripStatus", Long.class)
+                .setParameter("userId", userId)
+                .setParameter("tripStatus", TripStatus.ACTIVE)
+                .getSingleResult() > 0;
     }
 }

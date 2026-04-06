@@ -67,7 +67,8 @@ public class GlobalExceptionHandler {
             RentalPointNotEmptyException.class,
             ScooterNotAvailableException.class,
             TripAlreadyCompletedException.class,
-            UserHasNoActiveSeasonTicketException.class})
+            UserHasNoActiveSeasonTicketException.class,
+            UserAlreadyHasActiveTripException.class})
     public ResponseEntity<Map<String, String>> handleConflictException(RuntimeException e) {
         return buildResponse(HttpStatus.CONFLICT, e.getMessage(), e);
     }

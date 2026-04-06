@@ -70,6 +70,9 @@ public class TripServiceImpl implements TripService {
         if (tariff.getPaymentType() == PaymentType.SEASON_TICKET && user.getSeasonTicketEndDate() == null) {
             throw new UserHasNoActiveSeasonTicketException();
         }
+        if (tripDao.isThereActiveTripByUserId(userId)) {
+            throw new UserAlreadyHasActiveTripException();
+        }
         scooter.setScooterStatus(ScooterStatus.IN_RENT);
         Trip trip = new Trip(user, scooter, scooter.getRentalPoint(), LocalDateTime.now(), tariff);
         scooter.setRentalPoint(null);
@@ -93,6 +96,9 @@ public class TripServiceImpl implements TripService {
         Scooter scooter = trip.getScooter();
         LocalDateTime endTime = LocalDateTime.now();
         long tripTime = (long) Math.ceil((Duration.between(trip.getStartTime(), endTime).toMinutes() / 60.0));
+        if (tripTime == 0) {
+            tripTime = 1;
+        }
         BigDecimal totalCost = BigDecimal.ZERO;
         if (tariff.getPaymentType() == PaymentType.HOURLY) {
             totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTime)).multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
@@ -119,10 +125,13 @@ public class TripServiceImpl implements TripService {
         Tariff tariff = trip.getTariff();
         Scooter scooter = trip.getScooter();
         LocalDateTime endTime = LocalDateTime.now();
-        long tripTime = (long) (Duration.between(trip.getStartTime(), endTime).toMinutes() / 60.0);
+        long tripTime = (long) Math.ceil((Duration.between(trip.getStartTime(), endTime).toMinutes() / 60.0));
+        if (tripTime == 0) {
+            tripTime = 1;
+        }
         BigDecimal totalCost = BigDecimal.ZERO;
         if (tariff.getPaymentType() == PaymentType.HOURLY) {
-            totalCost = tariff.getPrice().multiply(new BigDecimal(tripTime)).multiply(new BigDecimal((100 - tariff.getDiscount()) / 100.0));
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTime)).multiply(BigDecimal.valueOf(((100 - tariff.getDiscount()) / 100.0)));
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndTime(endTime);

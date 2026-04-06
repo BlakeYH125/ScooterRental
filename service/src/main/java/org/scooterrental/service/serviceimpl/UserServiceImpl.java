@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto banAccount(Long userId, BanReason banReason) {
         User user = getUserOrThrow(userId);
-        user.setBanReason(BanReason.DEBT);
+        user.setBanReason(banReason);
         userDao.update(user);
         return userMapper.toUserDto(user);
     }

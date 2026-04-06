@@ -9,4 +9,5 @@ public interface TripDao {
     void update(Trip trip);
     Trip findTrip(Long tripId);
     List<Trip> findTrips();
+    boolean isThereActiveTripByUserId(Long userId);
 }
