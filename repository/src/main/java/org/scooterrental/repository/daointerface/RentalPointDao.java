@@ -8,6 +8,7 @@ public interface RentalPointDao {
     void create(RentalPoint rentalPoint);
     void update(RentalPoint rentalPoint);
     boolean delete(Long rentalPointId);
-    RentalPoint findRentalPoint(Long rentalPointId);
+    RentalPoint findRentalPointById(Long rentalPointId);
+    RentalPoint findRentalPointByLocation(String location);
     List<RentalPoint> findRentalPoints();
 }

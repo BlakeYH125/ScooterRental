@@ -44,4 +44,12 @@ public class ScooterDaoImpl implements ScooterDao {
     public List<Scooter> findScooters() {
         return sessionFactory.getCurrentSession().createQuery("FROM Scooter", Scooter.class).list();
     }
+
+    @Override
+    public Long countScootersAtRentalPoint(Long rentalPointId) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("SELECT COUNT(s) FROM Scooter s WHERE s.rentalPoint.rentalPointId = :rentalPointId", Long.class)
+                .setParameter("rentalPointId", rentalPointId)
+                .getSingleResult();
+    }
 }

@@ -10,4 +10,5 @@ public interface ScooterDao {
     boolean delete(Long scooterId);
     Scooter findScooter(Long scooterId);
     List<Scooter> findScooters();
+    Long countScootersAtRentalPoint(Long rentalPointId);
 }

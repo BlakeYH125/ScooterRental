@@ -10,6 +10,7 @@ public interface UserService {
     UserResponseDto addNewUser(UserCreateDto userCreateDto);
     UserResponseDto addMoney(Long userId, BigDecimal amount);
     UserResponseDto debitMoney(Long userId, BigDecimal amount);
-    UserResponseDto getUser(Long userId);
+    UserResponseDto getUserById(Long userId);
     List<UserResponseDto> getAllUsers();
+    UserResponseDto setAdmin(Long userId);
 }

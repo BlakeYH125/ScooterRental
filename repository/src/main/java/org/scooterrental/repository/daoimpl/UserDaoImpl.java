@@ -26,8 +26,14 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User findUser(Long userId) {
+    public User findUserById(Long userId) {
         return sessionFactory.getCurrentSession().get(User.class, userId);
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return sessionFactory.getCurrentSession().createQuery("FROM User WHERE username = :username", User.class)
+                .setParameter("username", username).getSingleResultOrNull();
     }
 
     @Override

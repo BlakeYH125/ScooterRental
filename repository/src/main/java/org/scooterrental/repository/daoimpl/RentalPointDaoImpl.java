@@ -27,21 +27,31 @@ public class RentalPointDaoImpl implements RentalPointDao {
 
     @Override
     public boolean delete(Long rentalPointId) {
-        RentalPoint rentalPoint = findRentalPoint(rentalPointId);
+        RentalPoint rentalPoint = findRentalPointById(rentalPointId);
         if (rentalPoint == null) {
             return false;
         }
-        sessionFactory.getCurrentSession().remove(rentalPoint);
+        rentalPoint.setDeleted(true);
+        update(rentalPoint);
         return true;
     }
 
     @Override
-    public RentalPoint findRentalPoint(Long rentalPointId) {
+    public RentalPoint findRentalPointById(Long rentalPointId) {
         return sessionFactory.getCurrentSession().get(RentalPoint.class, rentalPointId);
     }
 
     @Override
+    public RentalPoint findRentalPointByLocation(String location) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("FROM RentalPoint WHERE location = :location AND deleted = false", RentalPoint.class)
+                .setParameter("location", location).getSingleResultOrNull();
+    }
+
+    @Override
     public List<RentalPoint> findRentalPoints() {
-        return sessionFactory.getCurrentSession().createQuery("FROM RentalPoint", RentalPoint.class).list();
+        return sessionFactory.getCurrentSession()
+                .createQuery("FROM RentalPoint WHERE deleted = false", RentalPoint.class)
+                .list();
     }
 }

@@ -18,6 +18,9 @@ public class RentalPoint {
     @JoinColumn(name = "parent_point_id")
     private RentalPoint parentPoint;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
     public RentalPoint() {
     }
 
@@ -48,5 +51,13 @@ public class RentalPoint {
 
     public void setParentPoint(RentalPoint parentPoint) {
         this.parentPoint = parentPoint;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

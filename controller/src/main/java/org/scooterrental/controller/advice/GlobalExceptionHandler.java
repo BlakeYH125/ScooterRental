@@ -60,7 +60,11 @@ public class GlobalExceptionHandler {
             ScooterAlreadyInRentException.class,
             ScooterInServiceException.class,
             ScooterInWarehouseException.class,
-            UsernameAlreadyExistsException.class})
+            UsernameAlreadyExistsException.class,
+            UserAlreadyAdminException.class,
+            RentalPointAlreadyExistsException.class,
+            SameRentalPointsIDException.class,
+            RentalPointNotEmptyException.class})
     public ResponseEntity<Map<String, String>> handleConflictException(RuntimeException e) {
         return buildResponse(HttpStatus.CONFLICT, e.getMessage(), e);
     }
@@ -82,7 +86,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Map<String, String>> handleMethodNotAllowedException(HttpRequestMethodNotSupportedException e) {
-        return buildResponse(HttpStatus.METHOD_NOT_ALLOWED, "Запрос " + e.getMethod() + " не поддерживается для этого метода", e);
+        return buildResponse(HttpStatus.METHOD_NOT_ALLOWED, "Запрос " + e.getMethod() + " не поддерживается для этого адреса", e);
     }
 
     @ExceptionHandler(ValueLessZeroException.class)
