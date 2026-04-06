@@ -7,7 +7,7 @@ CREATE TABLE users (
     age INTEGER NOT NULL,
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     role VARCHAR(20) NOT NULL,
-    banned BOOLEAN NOT NULL DEFAULT FALSE,
+    ban_reason VARCHAR(50) NOT NULL DEFAULT 'NONE',
     season_ticket_end_date TIMESTAMP DEFAULT NULL
 );
 

@@ -1,6 +1,7 @@
 package org.scooterrental.model.entity;
 
 import jakarta.persistence.*;
+import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 
 import java.math.BigDecimal;
@@ -37,8 +38,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "banned", nullable = false)
-    private boolean banned = false;
+    @Column(name = "ban_reason", nullable = false)
+    private BanReason banReason = BanReason.NONE;
 
     @Column(name = "season_ticket_end_date")
     private LocalDateTime seasonTicketEndDate = null;
@@ -119,12 +120,12 @@ public class User {
         this.role = role;
     }
 
-    public boolean isBanned() {
-        return banned;
+    public BanReason getBanReason() {
+        return banReason;
     }
 
-    public void setBanned(boolean banned) {
-        this.banned = banned;
+    public void setBanReason(BanReason banReason) {
+        this.banReason = banReason;
     }
 
     public LocalDateTime getSeasonTicketEndDate() {

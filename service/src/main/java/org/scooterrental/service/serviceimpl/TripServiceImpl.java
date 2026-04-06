@@ -1,6 +1,7 @@
 package org.scooterrental.service.serviceimpl;
 
 import org.scooterrental.model.entity.*;
+import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.PaymentType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.enums.TripStatus;
@@ -46,7 +47,7 @@ public class TripServiceImpl implements TripService {
         if (user == null) {
             throw new UserNotFoundException();
         }
-        if (user.isBanned()) {
+        if (user.getBanReason() != BanReason.NONE) {
             throw new UserBannedException();
         }
         if (user.getBalance().compareTo(BigDecimal.ZERO) < 0) {
@@ -59,6 +60,9 @@ public class TripServiceImpl implements TripService {
         if (scooter.getScooterStatus() != ScooterStatus.AVAILABLE) {
             throw new ScooterNotAvailableException();
         }
+        if (scooter.getBatteryLevel() < 10) {
+            throw new ValueLessZeroException("Слишком низкий заряд батареи");
+        }
         Tariff tariff = tariffDao.findTariff(tariffId);
         if (tariff == null) {
             throw new TariffNotFoundException();
@@ -66,8 +70,11 @@ public class TripServiceImpl implements TripService {
         if (tariff.getPaymentType() == PaymentType.SEASON_TICKET && user.getSeasonTicketEndDate() == null) {
             throw new UserHasNoActiveSeasonTicketException();
         }
+        scooter.setScooterStatus(ScooterStatus.IN_RENT);
         Trip trip = new Trip(user, scooter, scooter.getRentalPoint(), LocalDateTime.now(), tariff);
+        scooter.setRentalPoint(null);
         tripDao.create(trip);
+        scooterDao.update(scooter);
         return tripMapper.toTripDto(trip);
     }
 
@@ -85,15 +92,16 @@ public class TripServiceImpl implements TripService {
         Tariff tariff = trip.getTariff();
         Scooter scooter = trip.getScooter();
         LocalDateTime endTime = LocalDateTime.now();
-        long tripTime = (long) (Duration.between(trip.getStartTime(), endTime).toMinutes() / 60.0);
+        long tripTime = (long) Math.ceil((Duration.between(trip.getStartTime(), endTime).toMinutes() / 60.0));
         BigDecimal totalCost = BigDecimal.ZERO;
         if (tariff.getPaymentType() == PaymentType.HOURLY) {
-            totalCost = tariff.getPrice().multiply(new BigDecimal(tripTime)).multiply(new BigDecimal((100 - tariff.getDiscount()) / 100.0));
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTime)).multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndPoint(endRentalPoint);
         trip.setEndTime(endTime);
         scooter.setScooterStatus(ScooterStatus.AVAILABLE);
+        scooter.setRentalPoint(endRentalPoint);
         userService.debitMoney(user.getUserId(), totalCost);
         trip.setTotalCost(totalCost);
         tripDao.update(trip);

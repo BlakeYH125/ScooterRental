@@ -1,6 +1,7 @@
 package org.scooterrental.service.serviceimpl;
 
 import org.scooterrental.model.entity.User;
+import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 import org.scooterrental.model.exception.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,9 +85,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto banAccount(Long userId) {
+    public UserResponseDto banAccount(Long userId, BanReason banReason) {
         User user = getUserOrThrow(userId);
-        user.setBanned(true);
+        user.setBanReason(BanReason.DEBT);
         userDao.update(user);
         return userMapper.toUserDto(user);
     }
@@ -94,7 +95,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto unbanAccount(Long userId) {
         User user = getUserOrThrow(userId);
-        user.setBanned(false);
+        user.setBanReason(BanReason.NONE);
         userDao.update(user);
         return userMapper.toUserDto(user);
     }
@@ -107,7 +108,9 @@ public class UserServiceImpl implements UserService {
         }
         user.setBalance(user.getBalance().add(amount));
         if (user.getBalance().compareTo(BigDecimal.ZERO) >= 0) {
-            user.setBanned(false);
+            if (user.getBanReason() == BanReason.DEBT) {
+                user.setBanReason(BanReason.NONE);
+            }
         }
         userDao.update(user);
         return userMapper.toUserDto(user);
@@ -121,7 +124,7 @@ public class UserServiceImpl implements UserService {
         }
         BigDecimal currentUserBalance = user.getBalance();
         if (currentUserBalance.subtract(amount).compareTo(BigDecimal.ZERO) < 0) {
-            user.setBanned(true);
+            user.setBanReason(BanReason.DEBT);
         }
         user.setBalance(currentUserBalance.subtract(amount));
         userDao.update(user);

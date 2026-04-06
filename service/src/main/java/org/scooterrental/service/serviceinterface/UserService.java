@@ -1,5 +1,6 @@
 package org.scooterrental.service.serviceinterface;
 
+import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.service.dto.UserCreateDto;
 import org.scooterrental.service.dto.UserResponseDto;
 
@@ -13,7 +14,7 @@ public interface UserService {
     UserResponseDto changeFirstName(Long userId, String newFirstName);
     UserResponseDto changeLastName(Long userId, String newLastName);
     UserResponseDto changeAge(Long userId, int newAge);
-    UserResponseDto banAccount(Long userId);
+    UserResponseDto banAccount(Long userId, BanReason banReason);
     UserResponseDto unbanAccount(Long userId);
     UserResponseDto addMoney(Long userId, BigDecimal amount);
     UserResponseDto debitMoney(Long userId, BigDecimal amount);
