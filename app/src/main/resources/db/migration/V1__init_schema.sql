@@ -7,7 +7,8 @@ CREATE TABLE users (
     age INTEGER NOT NULL,
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     role VARCHAR(20) NOT NULL,
-    banned BOOLEAN NOT NULL DEFAULT FALSE
+    banned BOOLEAN NOT NULL DEFAULT FALSE,
+    season_ticket_end_date TIMESTAMP DEFAULT NULL
 );
 
 CREATE TABLE tariffs (
@@ -34,6 +35,7 @@ CREATE TABLE scooters (
     battery_level INTEGER NOT NULL DEFAULT 100,
     scooter_status VARCHAR(50) NOT NULL DEFAULT 'IN_WAREHOUSE',
     rental_point_id BIGINT DEFAULT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
     CONSTRAINT fk_scooters_rental_point
     FOREIGN KEY (rental_point_id)

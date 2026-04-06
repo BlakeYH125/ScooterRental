@@ -31,7 +31,8 @@ public class ScooterDaoImpl implements ScooterDao {
         if (scooter == null) {
             return false;
         }
-        sessionFactory.getCurrentSession().remove(scooter);
+        scooter.setDeleted(true);
+        update(scooter);
         return true;
     }
 
@@ -42,13 +43,13 @@ public class ScooterDaoImpl implements ScooterDao {
 
     @Override
     public List<Scooter> findScooters() {
-        return sessionFactory.getCurrentSession().createQuery("FROM Scooter", Scooter.class).list();
+        return sessionFactory.getCurrentSession().createQuery("FROM Scooter WHERE deleted = false", Scooter.class).list();
     }
 
     @Override
     public Long countScootersAtRentalPoint(Long rentalPointId) {
         return sessionFactory.getCurrentSession()
-                .createQuery("SELECT COUNT(s) FROM Scooter s WHERE s.rentalPoint.rentalPointId = :rentalPointId", Long.class)
+                .createQuery("SELECT COUNT(s) FROM Scooter s WHERE s.rentalPoint.rentalPointId = :rentalPointId AND deleted = false", Long.class)
                 .setParameter("rentalPointId", rentalPointId)
                 .getSingleResult();
     }

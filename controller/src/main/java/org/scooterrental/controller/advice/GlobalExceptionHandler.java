@@ -64,7 +64,10 @@ public class GlobalExceptionHandler {
             UserAlreadyAdminException.class,
             RentalPointAlreadyExistsException.class,
             SameRentalPointsIDException.class,
-            RentalPointNotEmptyException.class})
+            RentalPointNotEmptyException.class,
+            ScooterNotAvailableException.class,
+            TripAlreadyCompletedException.class,
+            UserHasNoActiveSeasonTicketException.class})
     public ResponseEntity<Map<String, String>> handleConflictException(RuntimeException e) {
         return buildResponse(HttpStatus.CONFLICT, e.getMessage(), e);
     }
@@ -74,7 +77,7 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.FORBIDDEN, "К этому сайту у вас нет прав доступа", e);
     }
 
-    @ExceptionHandler({UserBannedException.class, AgeNotVerifiedException.class})
+    @ExceptionHandler(UserBannedException.class)
     public ResponseEntity<Map<String, String>> handleForbiddenException(RuntimeException e) {
         return buildResponse(HttpStatus.FORBIDDEN, e.getMessage(), e);
     }
@@ -89,7 +92,8 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.METHOD_NOT_ALLOWED, "Запрос " + e.getMethod() + " не поддерживается для этого адреса", e);
     }
 
-    @ExceptionHandler(ValueLessZeroException.class)
+    @ExceptionHandler({ValueLessZeroException.class,
+            IllegalArgumentException.class})
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(RuntimeException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
     }

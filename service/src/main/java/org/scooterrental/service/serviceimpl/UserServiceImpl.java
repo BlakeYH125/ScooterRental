@@ -12,6 +12,7 @@ import org.scooterrental.service.serviceinterface.UserService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -40,7 +41,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto changeUsername(Long userId, String newUsername) {
-        return null;
+        User user = getUserOrThrow(userId);
+        User userCheck = userDao.findUserByUsername(newUsername);
+        if (userCheck != null && !user.getUserId().equals(userCheck.getUserId())) {
+            throw new UsernameAlreadyExistsException();
+        }
+        user.setUsername(newUsername);
+        userDao.update(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override
@@ -50,35 +58,50 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto changeFirstName(Long userId, String newFirstName) {
-        return null;
+        User user = getUserOrThrow(userId);
+        user.setFirstName(newFirstName);
+        userDao.update(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override
     public UserResponseDto changeLastName(Long userId, String newLastName) {
-        return null;
+        User user = getUserOrThrow(userId);
+        user.setLastName(newLastName);
+        userDao.update(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override
-    public UserResponseDto changeAge(Long userId, int age) {
-        return null;
+    public UserResponseDto changeAge(Long userId, int newAge) {
+        User user = getUserOrThrow(userId);
+        if (newAge < 0) {
+            throw new ValueLessZeroException();
+        }
+        user.setAge(newAge);
+        userDao.update(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override
     public UserResponseDto banAccount(Long userId) {
-        return null;
+        User user = getUserOrThrow(userId);
+        user.setBanned(true);
+        userDao.update(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override
     public UserResponseDto unbanAccount(Long userId) {
-        return null;
+        User user = getUserOrThrow(userId);
+        user.setBanned(false);
+        userDao.update(user);
+        return userMapper.toUserDto(user);
     }
 
     @Override
     public UserResponseDto addMoney(Long userId, BigDecimal amount) {
-        User user = userDao.findUserById(userId);
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserOrThrow(userId);
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValueLessZeroException();
         }
@@ -92,10 +115,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto debitMoney(Long userId, BigDecimal amount) {
-        User user = userDao.findUserById(userId);
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserOrThrow(userId);
         if (amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new ValueLessZeroException();
         }
@@ -110,10 +130,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getUserById(Long userId) {
-        User user = userDao.findUserById(userId);
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserOrThrow(userId);
         return userMapper.toUserDto(user);
     }
 
@@ -126,10 +143,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto setAdmin(Long userId) {
-        User user = userDao.findUserById(userId);
-        if (user == null) {
-            throw new UserNotFoundException();
-        }
+        User user = getUserOrThrow(userId);
         if (user.getRole() == Role.ROLE_ADMIN) {
             throw new UserAlreadyAdminException();
         }
@@ -138,5 +152,28 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserDto(user);
     }
 
+    @Override
+    public UserResponseDto buySeasonTicket(Long userId, int monthsCount) {
+        User user = getUserOrThrow(userId);
+        if (monthsCount < 0 || monthsCount > 12) {
+            throw new IllegalArgumentException("Количество месяцев в абонементе может быть от 1 до 12");
+        }
+        LocalDateTime endDate;
+        if (user.getSeasonTicketEndDate() != null) {
+            endDate = user.getSeasonTicketEndDate().plusMonths(monthsCount);
+        } else {
+            endDate = LocalDateTime.now().plusMonths(monthsCount);
+        }
+        user.setSeasonTicketEndDate(endDate);
+        userDao.update(user);
+        return userMapper.toUserDto(user);
+    }
 
+    private User getUserOrThrow(Long userId) {
+        User user = userDao.findUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        return user;
+    }
 }

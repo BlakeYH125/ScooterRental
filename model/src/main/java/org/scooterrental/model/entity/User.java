@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.scooterrental.model.enums.Role;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users")
@@ -37,20 +38,21 @@ public class User {
     private Role role;
 
     @Column(name = "banned", nullable = false)
-    private boolean banned;
+    private boolean banned = false;
+
+    @Column(name = "season_ticket_end_date")
+    private LocalDateTime seasonTicketEndDate = null;
 
     public User() {
     }
 
-    public User(String username, String password, String firstName, String lastName, int age, BigDecimal balance, Role role, boolean banned) {
+    public User(String username, String password, String firstName, String lastName, int age, Role role) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
-        this.balance = balance;
         this.role = role;
-        this.banned = banned;
     }
 
     public Long getUserId() {
@@ -123,5 +125,13 @@ public class User {
 
     public void setBanned(boolean banned) {
         this.banned = banned;
+    }
+
+    public LocalDateTime getSeasonTicketEndDate() {
+        return seasonTicketEndDate;
+    }
+
+    public void setSeasonTicketEndDate(LocalDateTime seasonTicketEndDate) {
+        this.seasonTicketEndDate = seasonTicketEndDate;
     }
 }

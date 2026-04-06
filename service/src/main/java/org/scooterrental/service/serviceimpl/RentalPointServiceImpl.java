@@ -39,10 +39,7 @@ public class RentalPointServiceImpl implements RentalPointService {
         RentalPoint parentPoint = null;
         Long parentPointId = rentalPointCreateDto.getParentPointId();
         if (parentPointId != null) {
-            parentPoint = rentalPointDao.findRentalPointById(parentPointId);
-            if (parentPoint == null) {
-                throw new RentalPointNotFoundException();
-            }
+            parentPoint = getRentalPointOrThrow(parentPointId);
         }
         rentalPoint = rentalPointMapper.toRentalPointEntity(rentalPointCreateDto, parentPoint);
         rentalPointDao.create(rentalPoint);
@@ -55,10 +52,7 @@ public class RentalPointServiceImpl implements RentalPointService {
         if (rentalPoint != null) {
             throw new RentalPointAlreadyExistsException();
         }
-        rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
-        if (rentalPoint == null) {
-            throw new RentalPointNotFoundException();
-        }
+        rentalPoint = getRentalPointOrThrow(rentalPointId);
         rentalPoint.setLocation(newLocation);
         rentalPointDao.update(rentalPoint);
         return rentalPointMapper.toRentalPointDto(rentalPoint);
@@ -66,14 +60,8 @@ public class RentalPointServiceImpl implements RentalPointService {
 
     @Override
     public RentalPointResponseDto setNewParentPointId(Long rentalPointId, Long newParentPointId) {
-        RentalPoint newParentPoint = rentalPointDao.findRentalPointById(newParentPointId);
-        if (newParentPoint == null) {
-            throw new RentalPointNotFoundException();
-        }
-        RentalPoint rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
-        if (rentalPoint == null) {
-            throw new RentalPointNotFoundException();
-        }
+        RentalPoint newParentPoint = getRentalPointOrThrow(newParentPointId);
+        RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
         if (rentalPointId.equals(newParentPointId)) {
             throw new SameRentalPointsIDException();
         }
@@ -84,10 +72,7 @@ public class RentalPointServiceImpl implements RentalPointService {
 
     @Override
     public void deleteRentalPoint(Long rentalPointId) {
-        RentalPoint rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
-        if (rentalPoint == null) {
-            throw new RentalPointNotFoundException();
-        }
+        RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
         if (scooterDao.countScootersAtRentalPoint(rentalPointId) > 0) {
             throw new RentalPointNotEmptyException();
         }
@@ -98,10 +83,7 @@ public class RentalPointServiceImpl implements RentalPointService {
 
     @Override
     public RentalPointResponseDto getRentalPoint(Long rentalPointId) {
-        RentalPoint rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
-        if (rentalPoint == null) {
-            throw new RentalPointNotFoundException();
-        }
+        RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
         return rentalPointMapper.toRentalPointDto(rentalPoint);
     }
 
@@ -110,5 +92,13 @@ public class RentalPointServiceImpl implements RentalPointService {
         return rentalPointDao.findRentalPoints().stream()
                 .map(rentalPointMapper::toRentalPointDto)
                 .toList();
+    }
+
+    private RentalPoint getRentalPointOrThrow(Long rentalPointId) {
+        RentalPoint rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
+        if (rentalPoint == null) {
+            throw new RentalPointNotFoundException();
+        }
+        return rentalPoint;
     }
 }

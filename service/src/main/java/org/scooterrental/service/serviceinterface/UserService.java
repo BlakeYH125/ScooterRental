@@ -12,7 +12,7 @@ public interface UserService {
     UserResponseDto changePassword(Long userId, String newPassword);
     UserResponseDto changeFirstName(Long userId, String newFirstName);
     UserResponseDto changeLastName(Long userId, String newLastName);
-    UserResponseDto changeAge(Long userId, int age);
+    UserResponseDto changeAge(Long userId, int newAge);
     UserResponseDto banAccount(Long userId);
     UserResponseDto unbanAccount(Long userId);
     UserResponseDto addMoney(Long userId, BigDecimal amount);
@@ -20,4 +20,5 @@ public interface UserService {
     UserResponseDto getUserById(Long userId);
     List<UserResponseDto> getAllUsers();
     UserResponseDto setAdmin(Long userId);
+    UserResponseDto buySeasonTicket(Long userId, int MonthsCount);
 }

@@ -26,14 +26,14 @@ public class Scooter {
     @JoinColumn(name = "rental_point_id")
     private RentalPoint rentalPoint = null;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
     public Scooter() {
     }
 
-    public Scooter(String model, int batteryLevel, ScooterStatus scooterStatus, RentalPoint rentalPoint) {
+    public Scooter(String model) {
         this.model = model;
-        this.batteryLevel = batteryLevel;
-        this.scooterStatus = scooterStatus;
-        this.rentalPoint = rentalPoint;
     }
 
     public Long getScooterId() {
@@ -74,5 +74,13 @@ public class Scooter {
 
     public void setRentalPoint(RentalPoint rentalPoint) {
         this.rentalPoint = rentalPoint;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

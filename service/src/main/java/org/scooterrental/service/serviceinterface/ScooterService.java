@@ -10,6 +10,7 @@ public interface ScooterService {
     ScooterResponseDto addNewScooter(ScooterCreateDto scooterCreateDto);
     ScooterResponseDto setNewScooterModel(Long scooterId, String newScooterModel);
     ScooterResponseDto setNewBatteryLevel(Long scooterId, int newBatteryLevel);
+    ScooterResponseDto rechargeBattery(Long scooterId);
     ScooterResponseDto setNewScooterStatus(Long scooterId, ScooterStatus newScooterStatus);
     void deleteScooter(Long scooterId);
     ScooterResponseDto getScooter(Long scooterId);

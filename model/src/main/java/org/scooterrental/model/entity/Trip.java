@@ -51,15 +51,11 @@ public class Trip {
     public Trip() {
     }
 
-    public Trip(User user, Scooter scooter, TripStatus tripStatus, RentalPoint startPoint, RentalPoint endPoint, LocalDateTime startTime, LocalDateTime endTime, BigDecimal totalCost, Tariff tariff) {
+    public Trip(User user, Scooter scooter, RentalPoint startPoint, LocalDateTime startTime, Tariff tariff) {
         this.user = user;
         this.scooter = scooter;
-        this.tripStatus = tripStatus;
         this.startPoint = startPoint;
-        this.endPoint = endPoint;
         this.startTime = startTime;
-        this.endTime = endTime;
-        this.totalCost = totalCost;
         this.tariff = tariff;
     }
 
