@@ -39,6 +39,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponseDto changeUsername(Long userId, String newUsername) {
+        return null;
+    }
+
+    @Override
+    public UserResponseDto changePassword(Long userId, String newPassword) {
+        return null;
+    }
+
+    @Override
+    public UserResponseDto changeFirstName(Long userId, String newFirstName) {
+        return null;
+    }
+
+    @Override
+    public UserResponseDto changeLastName(Long userId, String newLastName) {
+        return null;
+    }
+
+    @Override
+    public UserResponseDto changeAge(Long userId, int age) {
+        return null;
+    }
+
+    @Override
+    public UserResponseDto banAccount(Long userId) {
+        return null;
+    }
+
+    @Override
+    public UserResponseDto unbanAccount(Long userId) {
+        return null;
+    }
+
+    @Override
     public UserResponseDto addMoney(Long userId, BigDecimal amount) {
         User user = userDao.findUserById(userId);
         if (user == null) {
@@ -102,4 +137,6 @@ public class UserServiceImpl implements UserService {
         userDao.update(user);
         return userMapper.toUserDto(user);
     }
+
+
 }

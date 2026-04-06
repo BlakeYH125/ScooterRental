@@ -8,6 +8,13 @@ import java.util.List;
 
 public interface UserService {
     UserResponseDto addNewUser(UserCreateDto userCreateDto);
+    UserResponseDto changeUsername(Long userId, String newUsername);
+    UserResponseDto changePassword(Long userId, String newPassword);
+    UserResponseDto changeFirstName(Long userId, String newFirstName);
+    UserResponseDto changeLastName(Long userId, String newLastName);
+    UserResponseDto changeAge(Long userId, int age);
+    UserResponseDto banAccount(Long userId);
+    UserResponseDto unbanAccount(Long userId);
     UserResponseDto addMoney(Long userId, BigDecimal amount);
     UserResponseDto debitMoney(Long userId, BigDecimal amount);
     UserResponseDto getUserById(Long userId);

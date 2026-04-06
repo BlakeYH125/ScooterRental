@@ -36,16 +36,13 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(name = "verified", nullable = false)
-    private boolean verified;
-
     @Column(name = "banned", nullable = false)
     private boolean banned;
 
     public User() {
     }
 
-    public User(String username, String password, String firstName, String lastName, int age, BigDecimal balance, Role role, boolean verified, boolean banned) {
+    public User(String username, String password, String firstName, String lastName, int age, BigDecimal balance, Role role, boolean banned) {
         this.username = username;
         this.password = password;
         this.firstName = firstName;
@@ -53,7 +50,6 @@ public class User {
         this.age = age;
         this.balance = balance;
         this.role = role;
-        this.verified = verified;
         this.banned = banned;
     }
 
@@ -119,14 +115,6 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public boolean isVerified() {
-        return verified;
-    }
-
-    public void setVerified(boolean verified) {
-        this.verified = verified;
     }
 
     public boolean isBanned() {

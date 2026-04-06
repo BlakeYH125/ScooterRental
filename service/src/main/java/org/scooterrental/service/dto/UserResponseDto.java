@@ -19,8 +19,6 @@ public class UserResponseDto {
 
     private Role role;
 
-    private boolean verified;
-
     private boolean banned;
 
     public UserResponseDto() {
@@ -80,14 +78,6 @@ public class UserResponseDto {
 
     public void setRole(Role role) {
         this.role = role;
-    }
-
-    public boolean isVerified() {
-        return verified;
-    }
-
-    public void setVerified(boolean verified) {
-        this.verified = verified;
     }
 
     public boolean isBanned() {
