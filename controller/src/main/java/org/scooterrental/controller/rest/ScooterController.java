@@ -1,0 +1,69 @@
+package org.scooterrental.controller.rest;
+
+import jakarta.validation.Valid;
+import org.scooterrental.model.enums.ScooterStatus;
+import org.scooterrental.service.dto.ScooterCreateDto;
+import org.scooterrental.service.dto.ScooterResponseDto;
+import org.scooterrental.service.serviceinterface.ScooterService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/scooterrental/scooters")
+public class ScooterController {
+
+    private final ScooterService scooterService;
+
+    public ScooterController(ScooterService scooterService) {
+        this.scooterService = scooterService;
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ScooterResponseDto> addNewScooter(@Valid @RequestBody ScooterCreateDto scooterCreateDto) {
+        return ResponseEntity.ok().body(scooterService.addNewScooter(scooterCreateDto));
+    }
+
+    @PatchMapping("/{scooterId}/set-new-model")
+    public ResponseEntity<ScooterResponseDto> setNewScooterModel(
+            @PathVariable("scooterId") Long scooterId,
+            @RequestParam("newScooterModel") String newScooterModel) {
+        return ResponseEntity.ok().body(scooterService.setNewScooterModel(scooterId, newScooterModel));
+    }
+
+    @PatchMapping("/{scooterId}/set-new-battery-level")
+    public ResponseEntity<ScooterResponseDto> setNewBatteryLevel(
+            @PathVariable("scooterId") Long scooterId,
+            @RequestParam("newBatteryLevel") int newBatteryLevel) {
+        return ResponseEntity.ok().body(scooterService.setNewBatteryLevel(scooterId, newBatteryLevel));
+    }
+
+    @PatchMapping("/{scooterId}/recharge-battery")
+    public ResponseEntity<ScooterResponseDto> rechargeBattery(@PathVariable("scooterId") Long scooterId) {
+        return ResponseEntity.ok().body(scooterService.rechargeBattery(scooterId));
+    }
+
+    @PatchMapping("/{scooterId}/set-new-scooter-status")
+    public ResponseEntity<ScooterResponseDto> setNewScooterStatus(
+            @PathVariable("scooterId") Long scooterId,
+            @RequestParam("newScooterStatus")ScooterStatus newScooterStatus) {
+        return ResponseEntity.ok().body(scooterService.setNewScooterStatus(scooterId, newScooterStatus));
+    }
+
+    @DeleteMapping("/{scooterId}/delete")
+    public ResponseEntity<String> deleteScooter(@PathVariable("scooterId") Long scooterId) {
+        scooterService.deleteScooter(scooterId);
+        return ResponseEntity.ok().body("Удаление успешно");
+    }
+
+    @GetMapping("/{scooterId}")
+    public ResponseEntity<ScooterResponseDto> getScooter(@PathVariable("scooterId") Long scooterId) {
+        return ResponseEntity.ok().body(scooterService.getScooter(scooterId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ScooterResponseDto>> getAllScooters() {
+        return ResponseEntity.ok().body(scooterService.getAllScooters());
+    }
+}
