@@ -36,6 +36,7 @@ CREATE TABLE scooters (
     scooter_status VARCHAR(50) NOT NULL DEFAULT 'IN_WAREHOUSE',
     rental_point_id BIGINT DEFAULT NULL,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    mileage DECIMAL(10, 2) NOT NULL DEFAULT 0.0,
 
     CONSTRAINT fk_scooters_rental_point
     FOREIGN KEY (rental_point_id)

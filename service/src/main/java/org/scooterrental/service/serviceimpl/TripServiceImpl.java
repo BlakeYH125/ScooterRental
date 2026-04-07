@@ -7,11 +7,11 @@ import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.enums.TripStatus;
 import org.scooterrental.model.exception.*;
 import org.scooterrental.repository.daointerface.*;
+import org.scooterrental.service.dto.TripCreateDto;
 import org.scooterrental.service.dto.TripResponseDto;
 import org.scooterrental.service.mapper.TripMapper;
 import org.scooterrental.service.serviceinterface.TripService;
 import org.scooterrental.service.serviceinterface.UserService;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +42,10 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
-    public TripResponseDto startTrip(Long userId, Long scooterId, Long tariffId) {
+    public TripResponseDto startTrip(TripCreateDto tripCreateDto) {
+        Long userId = tripCreateDto.getUserId();
+        Long scooterId = tripCreateDto.getScooterId();
+        Long tariffId = tripCreateDto.getTariffId();
         User user = userDao.findUserById(userId);
         if (user == null) {
             throw new UserNotFoundException();
@@ -95,19 +98,24 @@ public class TripServiceImpl implements TripService {
         Tariff tariff = trip.getTariff();
         Scooter scooter = trip.getScooter();
         LocalDateTime endTime = LocalDateTime.now();
-        long tripTime = (long) Math.ceil((Duration.between(trip.getStartTime(), endTime).toMinutes() / 60.0));
-        if (tripTime == 0) {
-            tripTime = 1;
+        long tripTimeMinutes = Duration.between(trip.getStartTime(), endTime).toMinutes();
+        long tripTimeHours = (long) Math.ceil((tripTimeMinutes) / 60.0);
+        if (tripTimeHours == 0) {
+            tripTimeHours = 1;
+        }
+        if (tripTimeMinutes == 0) {
+            tripTimeMinutes = 1;
         }
         BigDecimal totalCost = BigDecimal.ZERO;
         if (tariff.getPaymentType() == PaymentType.HOURLY) {
-            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTime)).multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeHours)).multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndPoint(endRentalPoint);
         trip.setEndTime(endTime);
         scooter.setScooterStatus(ScooterStatus.AVAILABLE);
         scooter.setRentalPoint(endRentalPoint);
+        scooter.setMileage(scooter.getMileage() + tripTimeMinutes * 0.25);
         userService.debitMoney(user.getUserId(), totalCost);
         trip.setTotalCost(totalCost);
         tripDao.update(trip);
@@ -125,17 +133,22 @@ public class TripServiceImpl implements TripService {
         Tariff tariff = trip.getTariff();
         Scooter scooter = trip.getScooter();
         LocalDateTime endTime = LocalDateTime.now();
-        long tripTime = (long) Math.ceil((Duration.between(trip.getStartTime(), endTime).toMinutes() / 60.0));
-        if (tripTime == 0) {
-            tripTime = 1;
+        long tripTimeMinutes = Duration.between(trip.getStartTime(), endTime).toMinutes();
+        long tripTimeHours = (long) Math.ceil((tripTimeMinutes) / 60.0);
+        if (tripTimeHours == 0) {
+            tripTimeHours = 1;
+        }
+        if (tripTimeMinutes == 0) {
+            tripTimeMinutes = 1;
         }
         BigDecimal totalCost = BigDecimal.ZERO;
         if (tariff.getPaymentType() == PaymentType.HOURLY) {
-            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTime)).multiply(BigDecimal.valueOf(((100 - tariff.getDiscount()) / 100.0)));
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeHours)).multiply(BigDecimal.valueOf(((100 - tariff.getDiscount()) / 100.0)));
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndTime(endTime);
         scooter.setScooterStatus(ScooterStatus.IN_SERVICE);
+        scooter.setMileage(scooter.getMileage() + (int) (tripTimeMinutes * 0.25));
         userService.debitMoney(user.getUserId(), totalCost);
         trip.setTotalCost(totalCost);
         tripDao.update(trip);

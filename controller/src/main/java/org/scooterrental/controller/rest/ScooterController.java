@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/scooterrental/scooters")
+@RequestMapping("/scooter-rental/scooters")
 public class ScooterController {
 
     private final ScooterService scooterService;
@@ -54,7 +54,7 @@ public class ScooterController {
     @DeleteMapping("/{scooterId}/delete")
     public ResponseEntity<String> deleteScooter(@PathVariable("scooterId") Long scooterId) {
         scooterService.deleteScooter(scooterId);
-        return ResponseEntity.ok().body("Удаление успешно");
+        return ResponseEntity.ok().body("Удаление самоката успешно");
     }
 
     @GetMapping("/{scooterId}")

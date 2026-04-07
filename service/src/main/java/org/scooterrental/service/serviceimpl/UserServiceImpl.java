@@ -4,6 +4,7 @@ import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 import org.scooterrental.model.exception.*;
+import org.scooterrental.service.dto.ChangePasswordDto;
 import org.springframework.transaction.annotation.Transactional;
 import org.scooterrental.repository.daointerface.UserDao;
 import org.scooterrental.service.dto.UserCreateDto;
@@ -53,8 +54,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto changePassword(Long userId, String newPassword) {
-        return null;
+    public void changePassword(Long userId, ChangePasswordDto changePasswordDto) {
+
     }
 
     @Override

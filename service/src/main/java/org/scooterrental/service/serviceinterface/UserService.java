@@ -1,6 +1,7 @@
 package org.scooterrental.service.serviceinterface;
 
 import org.scooterrental.model.enums.BanReason;
+import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserCreateDto;
 import org.scooterrental.service.dto.UserResponseDto;
 
@@ -10,7 +11,7 @@ import java.util.List;
 public interface UserService {
     UserResponseDto addNewUser(UserCreateDto userCreateDto);
     UserResponseDto changeUsername(Long userId, String newUsername);
-    UserResponseDto changePassword(Long userId, String newPassword);
+    void changePassword(Long userId, ChangePasswordDto changePasswordDto);
     UserResponseDto changeFirstName(Long userId, String newFirstName);
     UserResponseDto changeLastName(Long userId, String newLastName);
     UserResponseDto changeAge(Long userId, int newAge);

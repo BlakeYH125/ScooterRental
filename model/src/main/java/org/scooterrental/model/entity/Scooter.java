@@ -29,6 +29,9 @@ public class Scooter {
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
+    @Column(name = "mileage", nullable = false)
+    private double mileage = 0.0;
+
     public Scooter() {
     }
 
@@ -82,5 +85,13 @@ public class Scooter {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public double getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(double mileage) {
+        this.mileage = mileage;
     }
 }

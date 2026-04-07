@@ -11,6 +11,8 @@ public class ScooterResponseDto {
 
     private Long rentalPointId;
 
+    private double mileage;
+
     public ScooterResponseDto() {
     }
 
@@ -52,5 +54,13 @@ public class ScooterResponseDto {
 
     public void setRentalPointId(Long rentalPointId) {
         this.rentalPointId = rentalPointId;
+    }
+
+    public double getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(double mileage) {
+        this.mileage = mileage;
     }
 }
