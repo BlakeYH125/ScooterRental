@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface UserService {
-    UserResponseDto addNewUser(UserCreateDto userCreateDto);
     UserResponseDto changeUsername(Long userId, String newUsername);
     void changePassword(Long userId, ChangePasswordDto changePasswordDto);
     UserResponseDto changeFirstName(Long userId, String newFirstName);

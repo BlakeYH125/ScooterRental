@@ -32,20 +32,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto addNewUser(UserCreateDto userCreateDto) {
-        String username = userCreateDto.getUsername();
-        User user = userDao.findUserByUsername(username);
-        if (user != null) {
-            throw new UsernameAlreadyExistsException();
-        }
-        user = userMapper.toUserEntity(userCreateDto);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(Role.ROLE_USER);
-        userDao.create(user);
-        return userMapper.toUserDto(user);
-    }
-
-    @Override
     public UserResponseDto changeUsername(Long userId, String newUsername) {
         User user = getUserOrThrow(userId);
         User userCheck = userDao.findUserByUsername(newUsername);
