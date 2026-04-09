@@ -21,7 +21,7 @@ services:
     depends_on:
       - postgres
     environment:
-      - DATABASE_URL=jdbc:postgresql://db:5432/hotel_db
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/scooter_rental_db
 volumes:
   postgres_data:
 

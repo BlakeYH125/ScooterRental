@@ -8,7 +8,6 @@ import org.scooterrental.service.dto.ChangePasswordDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.scooterrental.repository.daointerface.UserDao;
-import org.scooterrental.service.dto.UserCreateDto;
 import org.scooterrental.service.dto.UserResponseDto;
 import org.scooterrental.service.mapper.UserMapper;
 import org.scooterrental.service.serviceinterface.UserService;

@@ -21,11 +21,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponseDto> addNewUser(@Valid @RequestBody UserCreateDto userCreateDto) {
-        return ResponseEntity.ok().body(userService.addNewUser(userCreateDto));
-    }
-
     @PatchMapping("/{userId}/change-username")
     public ResponseEntity<UserResponseDto> changeUsername(@PathVariable("userId") Long userId, @RequestParam("newUsername") String newUsername) {
         return ResponseEntity.ok().body(userService.changeUsername(userId, newUsername));
