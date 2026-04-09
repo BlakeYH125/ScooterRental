@@ -2,6 +2,7 @@ package org.scooterrental.controller.rest;
 
 import jakarta.validation.Valid;
 import org.scooterrental.service.dto.RentalPointCreateDto;
+import org.scooterrental.service.dto.RentalPointDetailsDto;
 import org.scooterrental.service.dto.RentalPointResponseDto;
 import org.scooterrental.service.serviceinterface.RentalPointService;
 import org.springframework.http.ResponseEntity;
@@ -49,5 +50,10 @@ public class RentalPointController {
     @GetMapping
     public ResponseEntity<List<RentalPointResponseDto>> getAllRentalPoints() {
         return ResponseEntity.ok().body(rentalPointService.getAllRentalPoints());
+    }
+
+    @GetMapping("/{rentalPointId}/details")
+    public ResponseEntity<RentalPointDetailsDto> getRentalPointDetails(@PathVariable("rentalPointId") Long rentalPointId) {
+        return ResponseEntity.ok().body(rentalPointService.getRentalPointDetails(rentalPointId));
     }
 }

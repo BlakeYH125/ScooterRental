@@ -94,7 +94,8 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ValueLessZeroException.class,
-            IllegalArgumentException.class})
+            IllegalArgumentException.class,
+            PasswordMismatchException.class})
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(RuntimeException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
     }

@@ -10,4 +10,6 @@ public interface TripDao {
     Trip findTrip(Long tripId);
     List<Trip> findTrips();
     boolean isThereActiveTripByUserId(Long userId);
+    List<Trip> findTripsByUserId(Long userId);
+    List<Trip> findTripsByScooterId(Long scooterId);
 }

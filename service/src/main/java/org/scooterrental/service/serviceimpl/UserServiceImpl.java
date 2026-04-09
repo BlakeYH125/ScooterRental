@@ -5,6 +5,7 @@ import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 import org.scooterrental.model.exception.*;
 import org.scooterrental.service.dto.ChangePasswordDto;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.scooterrental.repository.daointerface.UserDao;
 import org.scooterrental.service.dto.UserCreateDto;
@@ -22,10 +23,12 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserDao userDao, UserMapper userMapper) {
+    public UserServiceImpl(UserDao userDao, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -36,6 +39,7 @@ public class UserServiceImpl implements UserService {
             throw new UsernameAlreadyExistsException();
         }
         user = userMapper.toUserEntity(userCreateDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(Role.ROLE_USER);
         userDao.create(user);
         return userMapper.toUserDto(user);
@@ -55,7 +59,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void changePassword(Long userId, ChangePasswordDto changePasswordDto) {
-
+        User user = getUserOrThrow(userId);
+        String currentPasswordCode = user.getPassword();
+        String currentPasswordFromDto = changePasswordDto.getOldPassword();
+        if (passwordEncoder.matches(currentPasswordFromDto, currentPasswordCode)) {
+            user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+        } else {
+            throw new PasswordMismatchException();
+        }
     }
 
     @Override

@@ -44,4 +44,20 @@ public class TripDaoImpl implements TripDao {
                 .setParameter("tripStatus", TripStatus.ACTIVE)
                 .getSingleResult() > 0;
     }
+
+    @Override
+    public List<Trip> findTripsByUserId(Long userId) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("FROM Trip WHERE user.userId = :userId", Trip.class)
+                .setParameter("userId", userId)
+                .list();
+    }
+
+    @Override
+    public List<Trip> findTripsByScooterId(Long scooterId) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("From Trip Where scooter.scooterId = :scooterId", Trip.class)
+                .setParameter("scooterId", scooterId)
+                .list();
+    }
 }

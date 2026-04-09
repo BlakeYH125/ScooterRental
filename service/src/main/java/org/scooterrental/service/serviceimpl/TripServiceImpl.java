@@ -169,6 +169,28 @@ public class TripServiceImpl implements TripService {
                 .toList();
     }
 
+    @Override
+    public List<TripResponseDto> getUserHistory(Long userId) {
+        User user = userDao.findUserById(userId);
+        if (user == null) {
+            throw new UserNotFoundException();
+        }
+        return tripDao.findTripsByUserId(userId).stream()
+                .map(tripMapper::toTripDto)
+                .toList();
+    }
+
+    @Override
+    public List<TripResponseDto> getScooterHistory(Long scooterId) {
+        Scooter scooter = scooterDao.findScooter(scooterId);
+        if (scooter == null) {
+            throw new ScooterNotFoundException();
+        }
+        return tripDao.findTripsByScooterId(scooterId).stream()
+                .map(tripMapper::toTripDto)
+                .toList();
+    }
+
     private Trip getTripOrThrow(Long tripId) {
         Trip trip = tripDao.findTrip(tripId);
         if (trip == null) {

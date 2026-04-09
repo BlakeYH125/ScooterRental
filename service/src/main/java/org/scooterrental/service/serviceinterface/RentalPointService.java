@@ -1,6 +1,7 @@
 package org.scooterrental.service.serviceinterface;
 
 import org.scooterrental.service.dto.RentalPointCreateDto;
+import org.scooterrental.service.dto.RentalPointDetailsDto;
 import org.scooterrental.service.dto.RentalPointResponseDto;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface RentalPointService {
     void deleteRentalPoint(Long rentalPointId);
     RentalPointResponseDto getRentalPoint(Long rentalPointId);
     List<RentalPointResponseDto> getAllRentalPoints();
+    RentalPointDetailsDto getRentalPointDetails(Long rentalPointId);
 }

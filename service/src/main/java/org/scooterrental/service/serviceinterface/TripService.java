@@ -11,4 +11,6 @@ public interface TripService {
     TripResponseDto emergencyFinishTrip(Long tripId);
     TripResponseDto getTrip(Long tripId);
     List<TripResponseDto> getAllTrips();
+    List<TripResponseDto> getUserHistory(Long userId);
+    List<TripResponseDto> getScooterHistory(Long scooterId);
 }

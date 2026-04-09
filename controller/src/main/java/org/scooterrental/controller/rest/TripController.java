@@ -43,4 +43,14 @@ public class TripController {
     public ResponseEntity<List<TripResponseDto>> getAllTrips() {
         return ResponseEntity.ok().body(tripService.getAllTrips());
     }
+
+    @GetMapping("/user-history/{userId}")
+    public ResponseEntity<List<TripResponseDto>> getUserHistory(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok().body(tripService.getUserHistory(userId));
+    }
+
+    @GetMapping("/scooter-history/{scooterId}")
+    public ResponseEntity<List<TripResponseDto>> getScooterHistory(@PathVariable("scooterId") Long scooterId) {
+        return ResponseEntity.ok().body(tripService.getScooterHistory(scooterId));
+    }
 }

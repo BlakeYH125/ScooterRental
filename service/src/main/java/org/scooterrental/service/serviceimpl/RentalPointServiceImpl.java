@@ -1,7 +1,11 @@
 package org.scooterrental.service.serviceimpl;
 
+import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
 import org.scooterrental.repository.daointerface.ScooterDao;
+import org.scooterrental.service.dto.RentalPointDetailsDto;
+import org.scooterrental.service.dto.ScooterResponseDto;
+import org.scooterrental.service.mapper.ScooterMapper;
 import org.springframework.transaction.annotation.Transactional;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.exception.RentalPointAlreadyExistsException;
@@ -22,11 +26,13 @@ public class RentalPointServiceImpl implements RentalPointService {
     private final RentalPointDao rentalPointDao;
     private final ScooterDao scooterDao;
     private final RentalPointMapper rentalPointMapper;
+    private final ScooterMapper scooterMapper;
 
-    public RentalPointServiceImpl(RentalPointDao rentalPointDao, RentalPointMapper rentalPointMapper, ScooterDao scooterDao) {
+    public RentalPointServiceImpl(RentalPointDao rentalPointDao, RentalPointMapper rentalPointMapper, ScooterDao scooterDao, ScooterMapper scooterMapper) {
         this.rentalPointDao = rentalPointDao;
         this.rentalPointMapper = rentalPointMapper;
         this.scooterDao = scooterDao;
+        this.scooterMapper = scooterMapper;
     }
 
     @Override
@@ -92,6 +98,19 @@ public class RentalPointServiceImpl implements RentalPointService {
         return rentalPointDao.findRentalPoints().stream()
                 .map(rentalPointMapper::toRentalPointDto)
                 .toList();
+    }
+
+    @Override
+    public RentalPointDetailsDto getRentalPointDetails(Long rentalPointId) {
+        RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
+        List<ScooterResponseDto> scooters = scooterDao.findScootersByRentalPoint(rentalPointId).stream()
+                .map(scooterMapper::toScooterDto)
+                .toList();
+        RentalPointDetailsDto rentalPointDetailsDto = new RentalPointDetailsDto();
+        rentalPointDetailsDto.setRentalPointId(rentalPointId);
+        rentalPointDetailsDto.setLocation(rentalPoint.getLocation());
+        rentalPointDetailsDto.setScooters(scooters);
+        return rentalPointDetailsDto;
     }
 
     private RentalPoint getRentalPointOrThrow(Long rentalPointId) {

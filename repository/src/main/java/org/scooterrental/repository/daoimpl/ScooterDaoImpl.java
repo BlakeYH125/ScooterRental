@@ -53,4 +53,12 @@ public class ScooterDaoImpl implements ScooterDao {
                 .setParameter("rentalPointId", rentalPointId)
                 .getSingleResult();
     }
+
+    @Override
+    public List<Scooter> findScootersByRentalPoint(Long rentalPointId) {
+        return sessionFactory.getCurrentSession()
+                .createQuery("FROM Scooter s WHERE s.rentalPoint.rentalPointId = :rentalPointId AND deleted = false", Scooter.class)
+                .setParameter("rentalPointId", rentalPointId)
+                .list();
+    }
 }
