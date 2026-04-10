@@ -1,4 +1,4 @@
-package org.scooterrental.app;
+package org.scooterrental.app.config;
 
 import org.flywaydb.core.Flyway;
 import org.hibernate.SessionFactory;

@@ -1,1 +1,0 @@
-INSERT INTO users (username, password, first_name, last_name, age, role) VALUES ('admin', '$2a$10$Y566P168N9S5S/U.j369uOKZInBvS8T8PBRzT5iFhS0.8f1eD0ZpG', 'admin', 'admin', 1, 'ROLE_ADMIN')
