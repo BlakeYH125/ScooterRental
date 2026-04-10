@@ -5,6 +5,8 @@ import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 import org.scooterrental.model.exception.*;
 import org.scooterrental.service.dto.ChangePasswordDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.scooterrental.repository.daointerface.UserDao;
@@ -23,6 +25,7 @@ public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     public UserServiceImpl(UserDao userDao, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userDao = userDao;
@@ -39,6 +42,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setUsername(newUsername);
         userDao.update(user);
+        logger.info("Пользователь {} успешно изменил имя пользователя", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -49,6 +53,7 @@ public class UserServiceImpl implements UserService {
         String currentPasswordFromDto = changePasswordDto.getOldPassword();
         if (passwordEncoder.matches(currentPasswordFromDto, currentPasswordCode)) {
             user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+            logger.info("Пользователь {} успешно изменил пароль", userId);
         } else {
             throw new PasswordMismatchException();
         }
@@ -59,6 +64,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserOrThrow(userId);
         user.setFirstName(newFirstName);
         userDao.update(user);
+        logger.info("Пользователь {} успешно изменил имя", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -67,6 +73,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserOrThrow(userId);
         user.setLastName(newLastName);
         userDao.update(user);
+        logger.info("Пользователь {} успешно изменил фамилию", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -78,6 +85,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setAge(newAge);
         userDao.update(user);
+        logger.info("Пользователь {} успешно изменил возраст", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -86,6 +94,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserOrThrow(userId);
         user.setBanReason(banReason);
         userDao.update(user);
+        logger.info("Пользователь {} был заблокирован по причине {}", userId, banReason);
         return userMapper.toUserDto(user);
     }
 
@@ -94,6 +103,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserOrThrow(userId);
         user.setBanReason(BanReason.NONE);
         userDao.update(user);
+        logger.info("Пользователь {} был разблокирован", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -110,6 +120,7 @@ public class UserServiceImpl implements UserService {
             }
         }
         userDao.update(user);
+        logger.info("Баланс пользователя {} успешно пополнен", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -125,20 +136,24 @@ public class UserServiceImpl implements UserService {
         }
         user.setBalance(currentUserBalance.subtract(amount));
         userDao.update(user);
+        logger.info("С баланса пользователя {} успешно списаны средства", userId);
         return userMapper.toUserDto(user);
     }
 
     @Override
     public UserResponseDto getUserById(Long userId) {
         User user = getUserOrThrow(userId);
+        logger.info("Пользователь {} успешно запрошен", userId);
         return userMapper.toUserDto(user);
     }
 
     @Override
     public List<UserResponseDto> getAllUsers() {
-        return userDao.findUsers().stream()
+        List<UserResponseDto> list = userDao.findUsers().stream()
                 .map(userMapper::toUserDto)
                 .toList();
+        logger.info("Успешно запрошен список всех пользователей");
+        return list;
     }
 
     @Override
@@ -149,6 +164,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setRole(Role.ROLE_ADMIN);
         userDao.update(user);
+        logger.info("Пользователь {} успешно назначен администратором", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -166,6 +182,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setSeasonTicketEndDate(endDate);
         userDao.update(user);
+        logger.info("Пользователь {} успешно приобрел абонемент", userId);
         return userMapper.toUserDto(user);
     }
 

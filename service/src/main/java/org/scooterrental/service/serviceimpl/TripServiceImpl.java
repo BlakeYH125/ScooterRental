@@ -12,6 +12,8 @@ import org.scooterrental.service.dto.TripResponseDto;
 import org.scooterrental.service.mapper.TripMapper;
 import org.scooterrental.service.serviceinterface.TripService;
 import org.scooterrental.service.serviceinterface.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ public class TripServiceImpl implements TripService {
     private final RentalPointDao rentalPointDao;
     private final TripMapper tripMapper;
     private final UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(TripServiceImpl.class);
 
     public TripServiceImpl(TripDao tripDao, UserDao userDao, ScooterDao scooterDao, TariffDao tariffDao, RentalPointDao rentalPointDao, TripMapper tripMapper, UserService userService) {
         this.tripDao = tripDao;
@@ -82,6 +85,7 @@ public class TripServiceImpl implements TripService {
         scooter.setRentalPoint(null);
         tripDao.create(trip);
         scooterDao.update(scooter);
+        logger.info("Пользователь с id {} успешно начал поездку на самокате {}", userId, scooterId);
         return tripMapper.toTripDto(trip);
     }
 
@@ -124,6 +128,7 @@ public class TripServiceImpl implements TripService {
         trip.setTotalCost(totalCost);
         tripDao.update(trip);
         scooterDao.update(scooter);
+        logger.info("Пользователь с id {} успешно завершил поездку {} на самокате {}", userId, tripId, scooter.getScooterId());
         return tripMapper.toTripDto(trip);
     }
 
@@ -157,20 +162,25 @@ public class TripServiceImpl implements TripService {
         trip.setTotalCost(totalCost);
         tripDao.update(trip);
         scooterDao.update(scooter);
+        logger.info("Поездка {} на самокате {} аварийно завершена", tripId, scooter.getScooterId());
         return tripMapper.toTripDto(trip);
     }
 
     @Override
     public TripResponseDto getTrip(Long tripId) {
         Trip trip = getTripOrThrow(tripId);
+        logger.info("Поездка {} успешно запрошена", tripId);
         return tripMapper.toTripDto(trip);
     }
 
     @Override
     public List<TripResponseDto> getAllTrips() {
-        return tripDao.findTrips().stream()
+        List<TripResponseDto> list =tripDao.findTrips().stream()
                 .map(tripMapper::toTripDto)
                 .toList();
+        logger.info("Успешно запрошен список всех поездок системы");
+        return list;
+
     }
 
     @Override
@@ -179,9 +189,11 @@ public class TripServiceImpl implements TripService {
         if (user == null) {
             throw new UserNotFoundException();
         }
-        return tripDao.findTripsByUserId(userId).stream()
+        List<TripResponseDto> list = tripDao.findTripsByUserId(userId).stream()
                 .map(tripMapper::toTripDto)
                 .toList();
+        logger.info("Пользователь {} успешно запросил историю своих поездок", userId);
+        return list;
     }
 
     @Override
@@ -190,9 +202,11 @@ public class TripServiceImpl implements TripService {
         if (scooter == null) {
             throw new ScooterNotFoundException();
         }
-        return tripDao.findTripsByScooterId(scooterId).stream()
+        List<TripResponseDto> list = tripDao.findTripsByScooterId(scooterId).stream()
                 .map(tripMapper::toTripDto)
                 .toList();
+        logger.info("Успешно запрошена история самоката {}", scooterId);
+        return list;
     }
 
     private Trip getTripOrThrow(Long tripId) {

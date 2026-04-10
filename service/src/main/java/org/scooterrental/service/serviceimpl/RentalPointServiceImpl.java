@@ -1,11 +1,12 @@
 package org.scooterrental.service.serviceimpl;
 
-import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
 import org.scooterrental.repository.daointerface.ScooterDao;
 import org.scooterrental.service.dto.RentalPointDetailsDto;
 import org.scooterrental.service.dto.ScooterResponseDto;
 import org.scooterrental.service.mapper.ScooterMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.exception.RentalPointAlreadyExistsException;
@@ -27,6 +28,7 @@ public class RentalPointServiceImpl implements RentalPointService {
     private final ScooterDao scooterDao;
     private final RentalPointMapper rentalPointMapper;
     private final ScooterMapper scooterMapper;
+    private static final Logger logger = LoggerFactory.getLogger(RentalPointServiceImpl.class);
 
     public RentalPointServiceImpl(RentalPointDao rentalPointDao, RentalPointMapper rentalPointMapper, ScooterDao scooterDao, ScooterMapper scooterMapper) {
         this.rentalPointDao = rentalPointDao;
@@ -49,6 +51,7 @@ public class RentalPointServiceImpl implements RentalPointService {
         }
         rentalPoint = rentalPointMapper.toRentalPointEntity(rentalPointCreateDto, parentPoint);
         rentalPointDao.create(rentalPoint);
+        logger.info("Новая точка аренды с местоположением {} успешно добавлена", rentalPointCreateDto.getLocation());
         return rentalPointMapper.toRentalPointDto(rentalPoint);
     }
 
@@ -61,6 +64,7 @@ public class RentalPointServiceImpl implements RentalPointService {
         rentalPoint = getRentalPointOrThrow(rentalPointId);
         rentalPoint.setLocation(newLocation);
         rentalPointDao.update(rentalPoint);
+        logger.info("Точке аренды {} успешно установлена новая локация", rentalPointId);
         return rentalPointMapper.toRentalPointDto(rentalPoint);
     }
 
@@ -73,6 +77,7 @@ public class RentalPointServiceImpl implements RentalPointService {
         }
         rentalPoint.setParentPoint(newParentPoint);
         rentalPointDao.update(rentalPoint);
+        logger.info("Точке аренды {} успешно установлена новая родительская точка", rentalPointId);
         return rentalPointMapper.toRentalPointDto(rentalPoint);
     }
 
@@ -85,19 +90,23 @@ public class RentalPointServiceImpl implements RentalPointService {
         if (!rentalPointDao.delete(rentalPointId)) {
             throw new IllegalArgumentException("Ошибка при удалении");
         }
+        logger.info("Точке аренды {} успешно удалена", rentalPointId);
     }
 
     @Override
     public RentalPointResponseDto getRentalPoint(Long rentalPointId) {
         RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
+        logger.info("Точке аренды {} успешно запрошена", rentalPointId);
         return rentalPointMapper.toRentalPointDto(rentalPoint);
     }
 
     @Override
     public List<RentalPointResponseDto> getAllRentalPoints() {
-        return rentalPointDao.findRentalPoints().stream()
+        List<RentalPointResponseDto> list = rentalPointDao.findRentalPoints().stream()
                 .map(rentalPointMapper::toRentalPointDto)
                 .toList();
+        logger.info("Успешно запрошен список всех точек аренды");
+        return list;
     }
 
     @Override
@@ -110,6 +119,7 @@ public class RentalPointServiceImpl implements RentalPointService {
         rentalPointDetailsDto.setRentalPointId(rentalPointId);
         rentalPointDetailsDto.setLocation(rentalPoint.getLocation());
         rentalPointDetailsDto.setScooters(scooters);
+        logger.info("Точка аренды {} со всеми деталями успешно запрошена", rentalPointId);
         return rentalPointDetailsDto;
     }
 

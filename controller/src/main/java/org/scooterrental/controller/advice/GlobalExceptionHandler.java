@@ -1,6 +1,8 @@
 package org.scooterrental.controller.advice;
 
 import org.scooterrental.model.exception.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -18,6 +20,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     private ResponseEntity<Map<String, String>> buildResponse(HttpStatus httpStatus, String message, Exception e) {
         Map<String, String> response = new LinkedHashMap<>();
         String errorMessage;
@@ -28,10 +32,12 @@ public class GlobalExceptionHandler {
         }
         response.put("type", e.getClass().getSimpleName());
         response.put("message", errorMessage);
+        logger.error("Ошибка: {}", errorMessage, e);
         return ResponseEntity.status(httpStatus).body(response);
     }
 
     private ResponseEntity<Map<String, String>> buildResponse(Map<String, String> errors) {
+        logger.error("Ошибка: {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 

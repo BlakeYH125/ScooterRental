@@ -3,12 +3,13 @@ package org.scooterrental.service.serviceimpl.security;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.Role;
 import org.scooterrental.model.exception.UsernameAlreadyExistsException;
-import org.scooterrental.model.exception.UsernameNotFoundException;
 import org.scooterrental.repository.daointerface.UserDao;
 import org.scooterrental.service.dto.AuthenticationResponseDto;
 import org.scooterrental.service.dto.LoginRequest;
 import org.scooterrental.service.dto.UserCreateDto;
 import org.scooterrental.service.serviceinterface.security.AuthenticationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 
     public AuthenticationServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
         this.userDao = userDao;
@@ -45,6 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userDao.create(user);
         AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
         authenticationResponseDto.setToken(jwtService.generateToken(username));
+        logger.info("Пользователь {} успешно зарегистрирован", username);
         return authenticationResponseDto;
     }
 
@@ -53,6 +56,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
         authenticationResponseDto.setToken(jwtService.generateToken(loginRequest.getUsername()));
+        logger.info("Пользователь {} успешно авторизован", loginRequest.getUsername());
         return authenticationResponseDto;
     }
 }

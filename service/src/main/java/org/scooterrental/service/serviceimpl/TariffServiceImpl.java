@@ -9,6 +9,8 @@ import org.scooterrental.service.dto.TariffCreateDto;
 import org.scooterrental.service.dto.TariffResponseDto;
 import org.scooterrental.service.mapper.TariffMapper;
 import org.scooterrental.service.serviceinterface.TariffService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ import java.util.List;
 public class TariffServiceImpl implements TariffService {
     private final TariffDao tariffDao;
     private final TariffMapper tariffMapper;
+    private static final Logger logger = LoggerFactory.getLogger(TariffServiceImpl.class);
 
     public TariffServiceImpl(TariffDao tariffDao, TariffMapper tariffMapper) {
         this.tariffDao = tariffDao;
@@ -30,6 +33,7 @@ public class TariffServiceImpl implements TariffService {
     public TariffResponseDto addNewTariff(TariffCreateDto tariffCreateDto) {
         Tariff tariff = tariffMapper.toTariffEntity(tariffCreateDto);
         tariffDao.create(tariff);
+        logger.info("Новый тариф успешно добавлен");
         return tariffMapper.toTariffDto(tariff);
     }
 
@@ -38,6 +42,7 @@ public class TariffServiceImpl implements TariffService {
         Tariff tariff = getTariffOrThrow(tariffId);
         tariff.setPaymentType(newPaymentType);
         tariffDao.update(tariff);
+        logger.info("Тарифу {} успешно присвоен новый способ оплаты", tariffId);
         return tariffMapper.toTariffDto(tariff);
     }
 
@@ -49,6 +54,7 @@ public class TariffServiceImpl implements TariffService {
         }
         tariff.setPrice(newPrice);
         tariffDao.update(tariff);
+        logger.info("Тарифу {} успешно присвоена новая цена", tariffId);
         return tariffMapper.toTariffDto(tariff);
     }
 
@@ -60,20 +66,24 @@ public class TariffServiceImpl implements TariffService {
         }
         tariff.setDiscount(newDiscount);
         tariffDao.update(tariff);
+        logger.info("Тарифу {} успешно присвоена новая скидка", tariffId);
         return tariffMapper.toTariffDto(tariff);
     }
 
     @Override
     public TariffResponseDto getTariff(Long tariffId) {
         Tariff tariff = getTariffOrThrow(tariffId);
+        logger.info("Тариф {} успешно запрошен", tariffId);
         return tariffMapper.toTariffDto(tariff);
     }
 
     @Override
     public List<TariffResponseDto> getAllTariffs() {
-        return tariffDao.findTariffs().stream()
+        List<TariffResponseDto> list = tariffDao.findTariffs().stream()
                 .map(tariffMapper::toTariffDto)
                 .toList();
+        logger.info("Список всех тарифов успешно запрошен");
+        return list;
     }
 
     private Tariff getTariffOrThrow(Long tariffId) {

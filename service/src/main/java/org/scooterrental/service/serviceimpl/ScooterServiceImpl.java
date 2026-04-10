@@ -9,6 +9,8 @@ import org.scooterrental.service.dto.ScooterCreateDto;
 import org.scooterrental.service.dto.ScooterResponseDto;
 import org.scooterrental.service.mapper.ScooterMapper;
 import org.scooterrental.service.serviceinterface.ScooterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class ScooterServiceImpl implements ScooterService {
     private final ScooterDao scooterDao;
     private final ScooterMapper scooterMapper;
+    private static final Logger logger = LoggerFactory.getLogger(ScooterServiceImpl.class);
 
     public ScooterServiceImpl(ScooterDao scooterDao, ScooterMapper scooterMapper) {
         this.scooterDao = scooterDao;
@@ -29,6 +32,7 @@ public class ScooterServiceImpl implements ScooterService {
     public ScooterResponseDto addNewScooter(ScooterCreateDto scooterCreateDto) {
         Scooter scooter = scooterMapper.toScooterEntity(scooterCreateDto);
         scooterDao.create(scooter);
+        logger.info("Успешно добавлен новый самокат");
         return scooterMapper.toScooterDto(scooter);
     }
 
@@ -37,6 +41,7 @@ public class ScooterServiceImpl implements ScooterService {
         Scooter scooter = getScooterOrThrow(scooterId);
         scooter.setModel(newScooterModel);
         scooterDao.update(scooter);
+        logger.info("Самокату {} успешно установлена новая модель", scooterId);
         return scooterMapper.toScooterDto(scooter);
     }
 
@@ -48,6 +53,7 @@ public class ScooterServiceImpl implements ScooterService {
         }
         scooter.setBatteryLevel(newBatteryLevel);
         scooterDao.update(scooter);
+        logger.info("Самокату {} успешно установлен новый процент заряда батареи", scooterId);
         return scooterMapper.toScooterDto(scooter);
     }
 
@@ -56,6 +62,7 @@ public class ScooterServiceImpl implements ScooterService {
         Scooter scooter = getScooterOrThrow(scooterId);
         scooter.setBatteryLevel(100);
         scooterDao.update(scooter);
+        logger.info("Самокат {} успешно перезаряжен", scooterId);
         return scooterMapper.toScooterDto(scooter);
     }
 
@@ -70,6 +77,7 @@ public class ScooterServiceImpl implements ScooterService {
             scooter.setRentalPoint(null);
         }
         scooterDao.update(scooter);
+        logger.info("Самокату {} успешно установлен новый статус", scooterId);
         return scooterMapper.toScooterDto(scooter);
     }
 
@@ -78,19 +86,23 @@ public class ScooterServiceImpl implements ScooterService {
         if (!scooterDao.delete(scooterId)) {
             throw new IllegalArgumentException("Ошибка при удалении");
         }
+        logger.info("Самокат {} успешно удален", scooterId);
     }
 
     @Override
     public ScooterResponseDto getScooter(Long scooterId) {
         Scooter scooter = getScooterOrThrow(scooterId);
+        logger.info("Самокат {} успешно запрошен", scooterId);
         return scooterMapper.toScooterDto(scooter);
     }
 
     @Override
     public List<ScooterResponseDto> getAllScooters() {
-        return scooterDao.findScooters().stream()
+        List<ScooterResponseDto> list = scooterDao.findScooters().stream()
                 .map(scooterMapper::toScooterDto)
                 .toList();
+        logger.info("Успешно запрошен список всех самокатов");
+        return list;
     }
 
     private Scooter getScooterOrThrow(Long scooterId) {
