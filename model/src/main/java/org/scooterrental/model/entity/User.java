@@ -44,6 +44,7 @@ public class User implements UserDetails {
     private Role role;
 
     @Column(name = "ban_reason", nullable = false)
+    @Enumerated(EnumType.STRING)
     private BanReason banReason = BanReason.NONE;
 
     @Column(name = "season_ticket_end_date")
