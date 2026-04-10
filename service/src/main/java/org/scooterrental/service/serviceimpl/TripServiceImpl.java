@@ -12,6 +12,7 @@ import org.scooterrental.service.dto.TripResponseDto;
 import org.scooterrental.service.mapper.TripMapper;
 import org.scooterrental.service.serviceinterface.TripService;
 import org.scooterrental.service.serviceinterface.UserService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,8 +86,11 @@ public class TripServiceImpl implements TripService {
     }
 
     @Override
-    public TripResponseDto finishTrip(Long tripId, Long endRentalPointId) {
+    public TripResponseDto finishTrip(Long tripId, Long endRentalPointId, Long userId) {
         Trip trip = getTripOrThrow(tripId);
+        if (!trip.getUser().getUserId().equals(userId)) {
+            throw new AccessDeniedException("Вы не можете завершить чужую поездку");
+        }
         if (trip.getTripStatus() != TripStatus.ACTIVE) {
             throw new TripAlreadyCompletedException();
         }
