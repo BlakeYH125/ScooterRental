@@ -11,6 +11,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
@@ -20,6 +21,7 @@ import java.util.Properties;
 @Configuration(proxyBeanMethods = false)
 @ComponentScan("org.scooterrental")
 @PropertySource("classpath:application.properties")
+@EnableScheduling
 public class AppConfig {
 
     @Value("${database.url}")

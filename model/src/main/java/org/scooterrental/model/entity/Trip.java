@@ -44,6 +44,9 @@ public class Trip {
     @Column(name = "total_cost", nullable = false)
     private BigDecimal totalCost = BigDecimal.ZERO;
 
+    @Column(name = "mileage", nullable = false)
+    private double mileage = 0.0;
+
     @ManyToOne
     @JoinColumn(name = "tariff_id", nullable = false)
     private Tariff tariff;
@@ -137,5 +140,13 @@ public class Trip {
 
     public void setTariff(Tariff tariff) {
         this.tariff = tariff;
+    }
+
+    public double getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(double mileage) {
+        this.mileage = mileage;
     }
 }

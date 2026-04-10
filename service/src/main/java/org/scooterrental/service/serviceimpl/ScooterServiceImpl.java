@@ -1,9 +1,10 @@
 package org.scooterrental.service.serviceimpl;
 
+import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.model.enums.ScooterStatus;
-import org.scooterrental.model.exception.ScooterAlreadyInRentException;
-import org.scooterrental.model.exception.ScooterNotFoundException;
+import org.scooterrental.model.exception.*;
+import org.scooterrental.repository.daointerface.RentalPointDao;
 import org.scooterrental.repository.daointerface.ScooterDao;
 import org.scooterrental.service.dto.ScooterCreateDto;
 import org.scooterrental.service.dto.ScooterResponseDto;
@@ -20,11 +21,13 @@ import java.util.List;
 @Transactional
 public class ScooterServiceImpl implements ScooterService {
     private final ScooterDao scooterDao;
+    private final RentalPointDao rentalPointDao;
     private final ScooterMapper scooterMapper;
     private static final Logger logger = LoggerFactory.getLogger(ScooterServiceImpl.class);
 
-    public ScooterServiceImpl(ScooterDao scooterDao, ScooterMapper scooterMapper) {
+    public ScooterServiceImpl(ScooterDao scooterDao, RentalPointDao rentalPointDao, ScooterMapper scooterMapper) {
         this.scooterDao = scooterDao;
+        this.rentalPointDao = rentalPointDao;
         this.scooterMapper = scooterMapper;
     }
 
@@ -63,6 +66,42 @@ public class ScooterServiceImpl implements ScooterService {
         scooter.setBatteryLevel(100);
         scooterDao.update(scooter);
         logger.info("Самокат {} успешно перезаряжен", scooterId);
+        return scooterMapper.toScooterDto(scooter);
+    }
+
+    @Override
+    public ScooterResponseDto putScooterInUse(Long scooterId, Long rentalPointId) {
+        Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.getBatteryLevel() <= 5) {
+            throw new LowBatteryLevelException();
+        }
+        if (scooter.getScooterStatus() == ScooterStatus.IN_RENT) {
+            throw new ScooterAlreadyInRentException();
+        }
+        RentalPoint rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
+        if (rentalPoint == null) {
+            throw new RentalPointNotFoundException();
+        }
+        scooter.setRentalPoint(rentalPoint);
+        scooter.setScooterStatus(ScooterStatus.AVAILABLE);
+        scooterDao.update(scooter);
+        logger.info("Самокат {} успешно выпущен в пользование на точку аренды {}", scooterId, rentalPointId);
+        return scooterMapper.toScooterDto(scooter);
+    }
+
+    @Override
+    public ScooterResponseDto putScooterInWarehouse(Long scooterId) {
+        Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.getScooterStatus() == ScooterStatus.IN_WAREHOUSE) {
+            throw new ScooterInWarehouseException();
+        }
+        if (scooter.getScooterStatus() == ScooterStatus.IN_RENT) {
+            throw new ScooterAlreadyInRentException();
+        }
+        scooter.setRentalPoint(null);
+        scooter.setScooterStatus(ScooterStatus.IN_WAREHOUSE);
+        scooterDao.update(scooter);
+        logger.info("Самокат {} успешно отправлен на склад", scooterId);
         return scooterMapper.toScooterDto(scooter);
     }
 

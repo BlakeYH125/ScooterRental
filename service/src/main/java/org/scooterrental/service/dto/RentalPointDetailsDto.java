@@ -5,6 +5,7 @@ import java.util.List;
 public class RentalPointDetailsDto {
     private Long rentalPointId;
     private String location;
+    private boolean deleted;
     private List<ScooterResponseDto> scooters;
 
     public RentalPointDetailsDto() {
@@ -32,5 +33,13 @@ public class RentalPointDetailsDto {
 
     public void setScooters(List<ScooterResponseDto> scooters) {
         this.scooters = scooters;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

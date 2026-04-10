@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static org.scooterrental.model.enums.TripStatus.ACTIVE;
+
 @Repository
 public class TripDaoImpl implements TripDao {
     private final SessionFactory sessionFactory;
@@ -41,7 +43,7 @@ public class TripDaoImpl implements TripDao {
         return sessionFactory.getCurrentSession()
                 .createQuery("SELECT COUNT(t) FROM Trip t WHERE user.userId = :userId AND t.tripStatus = :tripStatus", Long.class)
                 .setParameter("userId", userId)
-                .setParameter("tripStatus", TripStatus.ACTIVE)
+                .setParameter("tripStatus", ACTIVE)
                 .getSingleResult() > 0;
     }
 
@@ -58,6 +60,13 @@ public class TripDaoImpl implements TripDao {
         return sessionFactory.getCurrentSession()
                 .createQuery("From Trip Where scooter.scooterId = :scooterId", Trip.class)
                 .setParameter("scooterId", scooterId)
+                .list();
+    }
+
+    @Override
+    public List<Trip> findActiveTrips() {
+        return sessionFactory.getCurrentSession()
+                .createQuery("FROM Trip WHERE tripStatus = ACTIVE", Trip.class)
                 .list();
     }
 }

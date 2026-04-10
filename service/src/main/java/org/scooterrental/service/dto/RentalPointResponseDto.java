@@ -4,6 +4,7 @@ public class RentalPointResponseDto {
     private Long rentalPointId;
     private String location;
     private Long parentPointId;
+    private boolean deleted;
 
     public RentalPointResponseDto() {
     }
@@ -30,5 +31,13 @@ public class RentalPointResponseDto {
 
     public void setParentPointId(Long parentPointId) {
         this.parentPointId = parentPointId;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 }

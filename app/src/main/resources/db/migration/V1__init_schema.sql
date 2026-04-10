@@ -53,6 +53,7 @@ CREATE TABLE trips (
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP,
     total_cost DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+    mileage DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     tariff_id BIGINT NOT NULL,
 
     CONSTRAINT fk_trips_users

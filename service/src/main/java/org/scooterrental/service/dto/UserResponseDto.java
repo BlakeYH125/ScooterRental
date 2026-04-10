@@ -3,6 +3,7 @@ package org.scooterrental.service.dto;
 import org.scooterrental.model.enums.Role;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 public class UserResponseDto {
     private Long userId;
@@ -20,6 +21,8 @@ public class UserResponseDto {
     private Role role;
 
     private String banReason;
+
+    private LocalDateTime seasonTicketEndDate;
 
     public UserResponseDto() {
     }
@@ -86,5 +89,13 @@ public class UserResponseDto {
 
     public void setBanReason(String banReason) {
         this.banReason = banReason;
+    }
+
+    public LocalDateTime getSeasonTicketEndDate() {
+        return seasonTicketEndDate;
+    }
+
+    public void setSeasonTicketEndDate(LocalDateTime seasonTicketEndDate) {
+        this.seasonTicketEndDate = seasonTicketEndDate;
     }
 }

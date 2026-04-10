@@ -39,6 +39,21 @@ public class ScooterController {
         return ResponseEntity.ok().body(scooterService.setNewScooterModel(scooterId, newScooterModel));
     }
 
+    @PatchMapping("/{scooterId}/put-in-use")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ScooterResponseDto> putScooterInUse(@PathVariable("scooterId") Long scooterId,
+                                                              @RequestParam("rentalPointId") Long rentalPointId) {
+        logger.info("Получен запрос на вывод самоката {} на использование", scooterId);
+        return ResponseEntity.ok().body(scooterService.putScooterInUse(scooterId, rentalPointId));
+    }
+
+    @PatchMapping("/{scooterId}/put-in-warehouse")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ScooterResponseDto> putScooterInWarehouse(@PathVariable("scooterId") Long scooterId) {
+        logger.info("Получен запрос на вывод самоката {} на склад", scooterId);
+        return ResponseEntity.ok().body(scooterService.putScooterInWarehouse(scooterId));
+    }
+
     @PatchMapping("/{scooterId}/set-new-battery-level")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ScooterResponseDto> setNewBatteryLevel(
@@ -59,7 +74,7 @@ public class ScooterController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ScooterResponseDto> setNewScooterStatus(
             @PathVariable("scooterId") Long scooterId,
-            @RequestParam("newScooterStatus")ScooterStatus newScooterStatus) {
+            @RequestParam("newScooterStatus") ScooterStatus newScooterStatus) {
         logger.info("Получен запрос на установку нового статуса у самоката {}", scooterId);
         return ResponseEntity.ok().body(scooterService.setNewScooterStatus(scooterId, newScooterStatus));
     }

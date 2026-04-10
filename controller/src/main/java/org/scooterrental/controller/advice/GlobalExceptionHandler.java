@@ -5,12 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -89,9 +91,9 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.FORBIDDEN, e.getMessage(), e);
     }
 
-    @ExceptionHandler({UsernameNotFoundException.class, WrongPasswordException.class})
+    @ExceptionHandler({UsernameNotFoundException.class, WrongPasswordException.class, BadCredentialsException.class})
     public ResponseEntity<Map<String, String>> handleUnauthorizedException(RuntimeException e) {
-        return buildResponse(HttpStatus.UNAUTHORIZED, e.getMessage(), e);
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Неверный логин или пароль", e);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -101,7 +103,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({ValueLessZeroException.class,
             IllegalArgumentException.class,
-            PasswordMismatchException.class})
+            PasswordMismatchException.class,
+            MethodArgumentTypeMismatchException.class,
+            LowBatteryLevelException.class})
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(RuntimeException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
     }

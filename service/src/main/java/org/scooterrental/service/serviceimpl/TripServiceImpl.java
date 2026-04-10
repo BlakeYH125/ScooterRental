@@ -121,6 +121,7 @@ public class TripServiceImpl implements TripService {
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndPoint(endRentalPoint);
         trip.setEndTime(endTime);
+        trip.setMileage(tripTimeMinutes * 0.25);
         scooter.setScooterStatus(ScooterStatus.AVAILABLE);
         scooter.setRentalPoint(endRentalPoint);
         scooter.setMileage(scooter.getMileage() + tripTimeMinutes * 0.25);
@@ -156,8 +157,9 @@ public class TripServiceImpl implements TripService {
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndTime(endTime);
+        trip.setMileage(tripTimeMinutes * 0.25);
         scooter.setScooterStatus(ScooterStatus.IN_SERVICE);
-        scooter.setMileage(scooter.getMileage() + (int) (tripTimeMinutes * 0.25));
+        scooter.setMileage(scooter.getMileage() + (tripTimeMinutes * 0.25));
         userService.debitMoney(user.getUserId(), totalCost);
         trip.setTotalCost(totalCost);
         tripDao.update(trip);

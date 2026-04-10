@@ -13,6 +13,7 @@ public class TripResponseDto {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private BigDecimal totalCost;
+    private double mileage;
     private Long tariffId;
 
     public TripResponseDto() {
@@ -96,5 +97,13 @@ public class TripResponseDto {
 
     public void setTariffId(Long tariffId) {
         this.tariffId = tariffId;
+    }
+
+    public double getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(double mileage) {
+        this.mileage = mileage;
     }
 }

@@ -119,6 +119,7 @@ public class RentalPointServiceImpl implements RentalPointService {
         rentalPointDetailsDto.setRentalPointId(rentalPointId);
         rentalPointDetailsDto.setLocation(rentalPoint.getLocation());
         rentalPointDetailsDto.setScooters(scooters);
+        rentalPointDetailsDto.setDeleted(rentalPoint.isDeleted());
         logger.info("Точка аренды {} со всеми деталями успешно запрошена", rentalPointId);
         return rentalPointDetailsDto;
     }
