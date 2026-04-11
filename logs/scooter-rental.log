@@ -1,0 +1,83 @@
+2026-04-11T14:52:54.123Z  INFO 1 --- [main] org.scooterrental.app.App                : Starting App using Java 17.0.18 with PID 1 (/app/app.jar started by root in /app)
+2026-04-11T14:52:54.152Z  INFO 1 --- [main] org.scooterrental.app.App                : No active profile set, falling back to 1 default profile: "default"
+2026-04-11T14:52:57.173Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-11T14:52:57.214Z  INFO 1 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-11T14:52:57.217Z  INFO 1 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2026-04-11T14:52:57.348Z  INFO 1 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-11T14:52:57.350Z  INFO 1 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3064 ms
+2026-04-11T14:53:00.682Z  INFO 1 --- [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://postgres:5432/scooter_rental_db (PostgreSQL 15.17)
+2026-04-11T14:53:01.113Z  INFO 1 --- [main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.166s)
+2026-04-11T14:53:01.232Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-04-11T14:53:01.256Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-04-11T14:53:01.820Z  INFO 1 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-04-11T14:53:02.234Z  INFO 1 --- [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-11T14:53:03.036Z  WARN 1 --- [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-11T14:53:05.580Z  INFO 1 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-11T14:53:07.406Z  INFO 1 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@57a0aeb8, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@45f70f68, org.springframework.security.web.context.SecurityContextHolderFilter@227c0cf7, org.springframework.security.web.header.HeaderWriterFilter@5cf6ba1c, org.springframework.security.web.authentication.logout.LogoutFilter@402d76c7, org.scooterrental.service.serviceimpl.security.JwtAuthenticationFilter@4f5bfbca, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@55465bfc, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@4bd1b07d, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@16e3d6d0, org.springframework.security.web.session.SessionManagementFilter@1f05d08c, org.springframework.security.web.access.ExceptionTranslationFilter@40b678b3, org.springframework.security.web.access.intercept.AuthorizationFilter@b332eda]
+2026-04-11T14:53:08.432Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-04-11T14:53:08.490Z  INFO 1 --- [main] org.scooterrental.app.App                : Started App in 15.889 seconds (process running for 17.571)
+2026-04-11T14:53:13.118Z  INFO 1 --- [main] org.scooterrental.app.App                : Starting App using Java 17.0.18 with PID 1 (/app/app.jar started by root in /app)
+2026-04-11T14:53:13.129Z  INFO 1 --- [main] org.scooterrental.app.App                : No active profile set, falling back to 1 default profile: "default"
+2026-04-11T14:53:16.129Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-11T14:53:16.187Z  INFO 1 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-11T14:53:16.197Z  INFO 1 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2026-04-11T14:53:16.416Z  INFO 1 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-11T14:53:16.418Z  INFO 1 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3142 ms
+2026-04-11T14:53:17.974Z  INFO 1 --- [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://postgres:5432/scooter_rental_db (PostgreSQL 15.17)
+2026-04-11T14:53:18.184Z  INFO 1 --- [main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.089s)
+2026-04-11T14:53:18.252Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-04-11T14:53:18.264Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-04-11T14:53:18.520Z  INFO 1 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-04-11T14:53:18.717Z  INFO 1 --- [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-11T14:53:19.038Z  WARN 1 --- [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-11T14:53:21.336Z  INFO 1 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-11T14:53:23.130Z  INFO 1 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@654dbb78, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@1dba7721, org.springframework.security.web.context.SecurityContextHolderFilter@5c141c7b, org.springframework.security.web.header.HeaderWriterFilter@62536882, org.springframework.security.web.authentication.logout.LogoutFilter@5f26fc4d, org.scooterrental.service.serviceimpl.security.JwtAuthenticationFilter@3220833f, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@363ee411, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5e572b08, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@24381e4a, org.springframework.security.web.session.SessionManagementFilter@48a2b492, org.springframework.security.web.access.ExceptionTranslationFilter@655b9169, org.springframework.security.web.access.intercept.AuthorizationFilter@49b6373f]
+2026-04-11T14:53:24.040Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-04-11T14:53:24.077Z  INFO 1 --- [main] org.scooterrental.app.App                : Started App in 12.275 seconds (process running for 13.451)
+2026-04-11T14:53:52.631Z  INFO 1 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-11T14:53:52.633Z  INFO 1 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-11T14:53:52.640Z  INFO 1 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-04-11T14:57:01.796Z  INFO 1 --- [main] org.scooterrental.app.App                : Starting App using Java 17.0.18 with PID 1 (/app/app.jar started by root in /app)
+2026-04-11T14:57:01.803Z  INFO 1 --- [main] org.scooterrental.app.App                : No active profile set, falling back to 1 default profile: "default"
+2026-04-11T14:57:04.844Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-11T14:57:04.895Z  INFO 1 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-11T14:57:04.897Z  INFO 1 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2026-04-11T14:57:05.037Z  INFO 1 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-11T14:57:05.039Z  INFO 1 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3126 ms
+2026-04-11T14:57:06.595Z  INFO 1 --- [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://postgres:5432/scooter_rental_db (PostgreSQL 15.17)
+2026-04-11T14:57:06.897Z  INFO 1 --- [main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.120s)
+2026-04-11T14:57:06.956Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-04-11T14:57:06.968Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-04-11T14:57:07.155Z  INFO 1 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-04-11T14:57:07.277Z  INFO 1 --- [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-11T14:57:07.478Z  WARN 1 --- [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-11T14:57:09.252Z  INFO 1 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-11T14:57:11.107Z  INFO 1 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1dba7721, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@24381e4a, org.springframework.security.web.context.SecurityContextHolderFilter@14f254f, org.springframework.security.web.header.HeaderWriterFilter@1e9d6c78, org.springframework.security.web.authentication.logout.LogoutFilter@3e8eea59, org.scooterrental.service.serviceimpl.security.JwtAuthenticationFilter@6aaf1ce8, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@4df54c1, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6908674b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6c3627c, org.springframework.security.web.session.SessionManagementFilter@7bf997e0, org.springframework.security.web.access.ExceptionTranslationFilter@4917992b, org.springframework.security.web.access.intercept.AuthorizationFilter@20f3291d]
+2026-04-11T14:57:11.821Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-04-11T14:57:11.851Z  INFO 1 --- [main] org.scooterrental.app.App                : Started App in 11.173 seconds (process running for 12.584)
+2026-04-11T14:57:12.153Z  INFO 1 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-11T14:57:12.155Z  INFO 1 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-11T14:57:12.157Z  INFO 1 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-04-11T14:57:13.813Z  INFO 1 --- [http-nio-8080-exec-9] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1032 ms
+2026-04-11T15:05:30.155Z  INFO 1 --- [main] org.scooterrental.app.App                : Starting App using Java 17.0.18 with PID 1 (/app/app.jar started by root in /app)
+2026-04-11T15:05:30.166Z  INFO 1 --- [main] org.scooterrental.app.App                : No active profile set, falling back to 1 default profile: "default"
+2026-04-11T15:05:33.254Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-11T15:05:33.319Z  INFO 1 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-11T15:05:33.321Z  INFO 1 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.33]
+2026-04-11T15:05:33.474Z  INFO 1 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-11T15:05:33.476Z  INFO 1 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3120 ms
+2026-04-11T15:05:35.158Z  INFO 1 --- [main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://postgres:5432/scooter_rental_db (PostgreSQL 15.17)
+2026-04-11T15:05:35.464Z  INFO 1 --- [main] o.f.core.internal.command.DbValidate     : Successfully validated 1 migration (execution time 00:00.120s)
+2026-04-11T15:05:35.533Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 1
+2026-04-11T15:05:35.543Z  INFO 1 --- [main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-04-11T15:05:35.751Z  INFO 1 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-04-11T15:05:35.852Z  INFO 1 --- [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-04-11T15:05:36.108Z  WARN 1 --- [main] org.hibernate.orm.deprecation            : HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-04-11T15:05:37.764Z  INFO 1 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-04-11T15:05:39.499Z  INFO 1 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@49b6373f, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@20f3291d, org.springframework.security.web.context.SecurityContextHolderFilter@48a2b492, org.springframework.security.web.header.HeaderWriterFilter@6f627a1a, org.springframework.security.web.authentication.logout.LogoutFilter@66ce4b4, org.scooterrental.service.serviceimpl.security.JwtAuthenticationFilter@1d4e06bb, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@71f86562, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@3f910f36, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2f51b100, org.springframework.security.web.session.SessionManagementFilter@5cfde2a4, org.springframework.security.web.access.ExceptionTranslationFilter@c040c8d, org.springframework.security.web.access.intercept.AuthorizationFilter@67b1c3af]
+2026-04-11T15:05:40.141Z  INFO 1 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path ''
+2026-04-11T15:05:40.172Z  INFO 1 --- [main] org.scooterrental.app.App                : Started App in 11.195 seconds (process running for 12.195)
+2026-04-11T15:05:55.766Z  INFO 1 --- [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-11T15:05:55.768Z  INFO 1 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-11T15:05:55.771Z  INFO 1 --- [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-04-11T15:06:02.283Z  INFO 1 --- [http-nio-8080-exec-2] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 926 ms
