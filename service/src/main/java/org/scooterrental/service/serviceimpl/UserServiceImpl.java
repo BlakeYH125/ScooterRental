@@ -53,6 +53,7 @@ public class UserServiceImpl implements UserService {
         String currentPasswordFromDto = changePasswordDto.getOldPassword();
         if (passwordEncoder.matches(currentPasswordFromDto, currentPasswordCode)) {
             user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
+            userDao.update(user);
             logger.info("Пользователь {} успешно изменил пароль", userId);
         } else {
             throw new PasswordMismatchException();
@@ -101,6 +102,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto unbanAccount(Long userId) {
         User user = getUserOrThrow(userId);
+        if (user.getBanReason() == BanReason.NONE) {
+            throw new UserNotBannedException();
+        }
         user.setBanReason(BanReason.NONE);
         userDao.update(user);
         logger.info("Пользователь {} был разблокирован", userId);
@@ -171,7 +175,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDto buySeasonTicket(Long userId, int monthsCount) {
         User user = getUserOrThrow(userId);
-        if (monthsCount < 0 || monthsCount > 12) {
+        if (monthsCount < 1 || monthsCount > 12) {
             throw new IllegalArgumentException("Количество месяцев в абонементе может быть от 1 до 12");
         }
         LocalDateTime endDate;

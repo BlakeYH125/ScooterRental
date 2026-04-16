@@ -123,7 +123,7 @@ public class ScooterServiceImpl implements ScooterService {
     @Override
     public void deleteScooter(Long scooterId) {
         if (!scooterDao.delete(scooterId)) {
-            throw new IllegalArgumentException("Ошибка при удалении");
+            throw new RuntimeException("Ошибка при удалении");
         }
         logger.info("Самокат {} успешно удален", scooterId);
     }

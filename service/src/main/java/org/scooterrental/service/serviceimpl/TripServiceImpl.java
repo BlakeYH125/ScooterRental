@@ -68,7 +68,7 @@ public class TripServiceImpl implements TripService {
             throw new ScooterNotAvailableException();
         }
         if (scooter.getBatteryLevel() < 10) {
-            throw new ValueLessZeroException("Слишком низкий заряд батареи");
+            throw new LowBatteryLevelException();
         }
         Tariff tariff = tariffDao.findTariff(tariffId);
         if (tariff == null) {

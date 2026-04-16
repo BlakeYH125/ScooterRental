@@ -88,7 +88,7 @@ public class RentalPointServiceImpl implements RentalPointService {
             throw new RentalPointNotEmptyException();
         }
         if (!rentalPointDao.delete(rentalPointId)) {
-            throw new IllegalArgumentException("Ошибка при удалении");
+            throw new RuntimeException("Ошибка при удалении");
         }
         logger.info("Точке аренды {} успешно удалена", rentalPointId);
     }
