@@ -8,7 +8,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
-import org.scooterrental.model.exception.*;
+import org.scooterrental.model.exception.UserNotBannedException;
+import org.scooterrental.model.exception.UserAlreadyAdminException;
+import org.scooterrental.model.exception.UsernameAlreadyExistsException;
+import org.scooterrental.model.exception.UserNotFoundException;
+import org.scooterrental.model.exception.ValueLessZeroException;
+import org.scooterrental.model.exception.PasswordMismatchException;
 import org.scooterrental.repository.daointerface.UserDao;
 import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserResponseDto;
@@ -21,8 +26,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {

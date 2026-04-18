@@ -6,20 +6,20 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-@Testcontainers
 @Transactional
 public abstract class IntegrationTestBase {
 
-    @Container
     static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:15-alpine")
             .withDatabaseName("scooter_rental_db_test")
         .withUsername("test")
         .withPassword("test");
+
+    static {
+        container.start();
+    }
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {

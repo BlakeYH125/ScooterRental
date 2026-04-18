@@ -2,7 +2,6 @@ package org.scooterrental.service.serviceinterface;
 
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.service.dto.ChangePasswordDto;
-import org.scooterrental.service.dto.UserCreateDto;
 import org.scooterrental.service.dto.UserResponseDto;
 
 import java.math.BigDecimal;

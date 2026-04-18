@@ -5,7 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.scooterrental.controller.advice.GlobalExceptionHandler;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.BanReason;
-import org.scooterrental.model.exception.*;
+import org.scooterrental.model.exception.UserNotBannedException;
+import org.scooterrental.model.exception.UserAlreadyAdminException;
+import org.scooterrental.model.exception.UsernameAlreadyExistsException;
+import org.scooterrental.model.exception.UserNotFoundException;
+import org.scooterrental.model.exception.ValueLessZeroException;
+import org.scooterrental.model.exception.PasswordMismatchException;
 import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserResponseDto;
 import org.scooterrental.service.serviceinterface.UserService;
@@ -24,12 +29,23 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyInt;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @WebMvcTest(UserController.class)
 @Import(GlobalExceptionHandler.class)
@@ -198,8 +214,6 @@ public class UserControllerTest {
         ChangePasswordDto changePasswordDto = new ChangePasswordDto();
         changePasswordDto.setOldPassword("oldPassword");
         changePasswordDto.setNewPassword("newPassword123");
-
-        doNothing().when(userService).changePassword(eq(userId), any(ChangePasswordDto.class));
 
         mockMvc.perform(patch("/scooter-rental/users/{userId}/change-password", userId)
                         .with(csrf())

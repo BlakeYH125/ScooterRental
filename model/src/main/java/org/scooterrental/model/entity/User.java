@@ -1,6 +1,13 @@
 package org.scooterrental.model.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 import org.springframework.security.core.GrantedAuthority;

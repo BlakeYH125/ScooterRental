@@ -1,14 +1,36 @@
 package org.scooterrental.controller.advice;
 
-import org.scooterrental.model.exception.*;
+import org.scooterrental.model.exception.RentalPointNotFoundException;
+import org.scooterrental.model.exception.RentalPointNotEmptyException;
+import org.scooterrental.model.exception.RentalPointAlreadyExistsException;
+import org.scooterrental.model.exception.SameRentalPointsIDException;
+import org.scooterrental.model.exception.ScooterNotFoundException;
+import org.scooterrental.model.exception.ScooterNotAvailableException;
+import org.scooterrental.model.exception.ScooterAlreadyInRentException;
+import org.scooterrental.model.exception.ScooterInWarehouseException;
+import org.scooterrental.model.exception.ScooterInServiceException;
+import org.scooterrental.model.exception.ScooterAlreadyAvailableException;
+import org.scooterrental.model.exception.UserNotBannedException;
+import org.scooterrental.model.exception.UserAlreadyAdminException;
+import org.scooterrental.model.exception.UserBannedException;
+import org.scooterrental.model.exception.UsernameAlreadyExistsException;
+import org.scooterrental.model.exception.UserAlreadyHasActiveTripException;
+import org.scooterrental.model.exception.UsernameNotFoundException;
+import org.scooterrental.model.exception.UserHasNoActiveSeasonTicketException;
+import org.scooterrental.model.exception.UserNotFoundException;
+import org.scooterrental.model.exception.TariffNotFoundException;
+import org.scooterrental.model.exception.TripAlreadyCompletedException;
+import org.scooterrental.model.exception.TripNotFoundException;
+import org.scooterrental.model.exception.WrongPasswordException;
+import org.scooterrental.model.exception.ValueLessZeroException;
+import org.scooterrental.model.exception.PasswordMismatchException;
+import org.scooterrental.model.exception.LowBatteryLevelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -19,7 +41,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 

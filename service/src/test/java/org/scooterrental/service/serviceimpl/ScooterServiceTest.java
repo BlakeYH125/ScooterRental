@@ -8,7 +8,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.model.enums.ScooterStatus;
-import org.scooterrental.model.exception.*;
+import org.scooterrental.model.exception.RentalPointNotFoundException;
+import org.scooterrental.model.exception.ScooterNotFoundException;
+import org.scooterrental.model.exception.ScooterAlreadyInRentException;
+import org.scooterrental.model.exception.ScooterInWarehouseException;
+import org.scooterrental.model.exception.LowBatteryLevelException;
 import org.scooterrental.repository.daointerface.RentalPointDao;
 import org.scooterrental.repository.daointerface.ScooterDao;
 import org.scooterrental.service.dto.ScooterCreateDto;
@@ -18,8 +22,14 @@ import org.scooterrental.service.mapper.ScooterMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 
 
 @ExtendWith(MockitoExtension.class)

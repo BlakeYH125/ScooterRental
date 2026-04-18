@@ -2,7 +2,6 @@ package org.scooterrental.repository.daoimpl;
 
 import org.hibernate.SessionFactory;
 import org.scooterrental.model.entity.Trip;
-import org.scooterrental.model.enums.TripStatus;
 import org.scooterrental.repository.daointerface.TripDao;
 import org.springframework.stereotype.Repository;
 
