@@ -21,6 +21,7 @@ import org.springframework.security.access.AccessDeniedException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -40,20 +41,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(httpStatus).body(response);
     }
 
-    private ResponseEntity<Map<String, String>> buildResponse(Map<String, String> errors) {
-        logger.error("Ошибка: {}", errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    private ResponseEntity<Map<String, String>> buildResponse(Map<String, String> response) {
+        logger.error("Ошибка: {}", response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleNotValidArgumentException(MethodArgumentNotValidException e) {
-        Map<String, String> map = new LinkedHashMap<>();
-        List<ObjectError> errors = e.getBindingResult().getAllErrors();
-        for (ObjectError error : errors) {
-            FieldError fieldError = (FieldError) error;
-            map.put(fieldError.getField(), fieldError.getDefaultMessage());
-        }
-        return buildResponse(map);
+        String combinedMessage = e.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + " " + fieldError.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+
+        Map<String, String> response = new LinkedHashMap<>();
+        response.put("type", e.getClass().getSimpleName());
+        response.put("message", combinedMessage);
+        return buildResponse(response);
     }
 
     @ExceptionHandler({RentalPointNotFoundException.class,
