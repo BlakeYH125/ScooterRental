@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
 import org.scooterrental.model.exception.ScooterNotFoundException;
@@ -213,6 +214,7 @@ public class ScooterServiceTest {
 
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setRentalPointId(rentalPointId);
+        rentalPoint.setRentalPointType(RentalPointType.BUILDING);
 
         when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
         when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(rentalPoint);

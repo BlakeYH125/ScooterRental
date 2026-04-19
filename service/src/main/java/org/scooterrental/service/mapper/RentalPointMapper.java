@@ -16,5 +16,6 @@ public interface RentalPointMapper {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(source = "rentalPointCreateDto.location", target = "location")
     @Mapping(source = "parentPoint", target = "parentPoint")
+    @Mapping(target = "rentalPointType", source = "rentalPointCreateDto.rentalPointType")
     RentalPoint toRentalPointEntity(RentalPointCreateDto rentalPointCreateDto, RentalPoint parentPoint);
 }

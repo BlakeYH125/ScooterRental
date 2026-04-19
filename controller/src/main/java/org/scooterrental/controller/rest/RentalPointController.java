@@ -82,4 +82,11 @@ public class RentalPointController {
         logger.info("Получен запрос на получение детальной информации о точке аренды {}", rentalPointId);
         return ResponseEntity.ok().body(rentalPointService.getRentalPointDetails(rentalPointId));
     }
+
+    @GetMapping("/{rentalPointId}/rental-stations")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER')")
+    public ResponseEntity<List<RentalPointResponseDto>> getRentalStationsByParentId(@PathVariable("rentalPointId") Long rentalPointId) {
+        logger.info("Получен запрос на поиск всех точек около зданий внутри области точки проката {}", rentalPointId);
+        return ResponseEntity.ok().body(rentalPointService.getRentalStationsByParentId(rentalPointId));
+    }
 }

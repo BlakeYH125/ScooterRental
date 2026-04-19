@@ -2,6 +2,7 @@ package org.scooterrental.service.dto;
 
 public class RentalPointResponseDto {
     private Long rentalPointId;
+    private String rentalPointType;
     private String location;
     private Long parentPointId;
     private boolean deleted;
@@ -15,6 +16,14 @@ public class RentalPointResponseDto {
 
     public void setRentalPointId(Long rentalPointId) {
         this.rentalPointId = rentalPointId;
+    }
+
+    public String getRentalPointType() {
+        return rentalPointType;
+    }
+
+    public void setRentalPointType(String rentalPointType) {
+        this.rentalPointType = rentalPointType;
     }
 
     public String getLocation() {

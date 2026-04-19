@@ -35,7 +35,7 @@ public class UserIntegrationTest extends IntegrationTestBase {
     private PasswordEncoder passwordEncoder;
 
     @Test
-    void shouldChangeUsername() throws Exception {
+    void shouldChangeUserData() throws Exception {
         User user = new User();
         user.setUsername("testuser");
         user.setPassword(passwordEncoder.encode("password"));
@@ -47,17 +47,31 @@ public class UserIntegrationTest extends IntegrationTestBase {
         user.setRole(Role.ROLE_USER);
         userDao.create(user);
 
+        String body = """
+                {
+                    "username": "newUsername",
+                    "firstName": "newFirstName",
+                    "lastName": "newLastName",
+                    "age": 24
+                }
+                """;
+
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-        mockMvc.perform(patch("/scooter-rental/users/" + user.getUserId() + "/change-username")
-                        .param("newUsername", "newUsername123")
-                        .with(authentication(auth)))
+        mockMvc.perform(patch("/scooter-rental/users/" + user.getUserId() + "/change-user-data")
+                        .with(authentication(auth))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("newUsername123"));
+                .andExpect(jsonPath("$.username").value("newUsername"))
+                .andExpect(jsonPath("$.firstName").value("newFirstName"))
+                .andExpect(jsonPath("$.lastName").value("newLastName"))
+                .andExpect(jsonPath("$.age").value("24"))
+        ;
     }
 
     @Test
-    void shouldThrowForbiddenWhenChangeUsernameOfAnotherUser() throws Exception {
+    void shouldThrowForbiddenWhenChangeUserDataOfAnotherUser() throws Exception {
         User user1 = new User();
         user1.setUsername("user1");
         user1.setPassword(passwordEncoder.encode("password"));
@@ -68,6 +82,15 @@ public class UserIntegrationTest extends IntegrationTestBase {
         user1.setBanReason(BanReason.NONE);
         user1.setRole(Role.ROLE_USER);
         userDao.create(user1);
+
+        String body = """
+                {
+                    "username": "newUsername",
+                    "firstName": "newFirstName",
+                    "lastName": "newLastName",
+                    "age": 24
+                }
+                """;
 
         User user2 = new User();
         user2.setUsername("user2");
@@ -82,9 +105,10 @@ public class UserIntegrationTest extends IntegrationTestBase {
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user2, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-        mockMvc.perform(patch("/scooter-rental/users/" + user1.getUserId() + "/change-username")
-                        .param("newUsername", "hacked")
-                        .with(authentication(auth)))
+        mockMvc.perform(patch("/scooter-rental/users/" + user1.getUserId() + "/change-user-data")
+                        .with(authentication(auth))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.type").value("AccessDeniedException"));
     }
@@ -102,24 +126,66 @@ public class UserIntegrationTest extends IntegrationTestBase {
         user1.setRole(Role.ROLE_USER);
         userDao.create(user1);
 
+        String body = """
+                {
+                    "username": "newUsername",
+                    "firstName": "newFirstName",
+                    "lastName": "newLastName",
+                    "age": 24
+                }
+                """;
+
         User user2 = new User();
-        user2.setUsername("user2");
+        user2.setUsername("newUsername");
         user2.setPassword(passwordEncoder.encode("password"));
         user2.setFirstName("Test");
-        user2.setLastName("User");
+        user2.setLastName("Test");
         user2.setAge(20);
         user2.setBalance(new BigDecimal(1000));
         user2.setBanReason(BanReason.NONE);
         user2.setRole(Role.ROLE_USER);
         userDao.create(user2);
 
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user2, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user1, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-        mockMvc.perform(patch("/scooter-rental/users/" + user2.getUserId() + "/change-username")
-                        .param("newUsername", "existing")
-                        .with(authentication(auth)))
+        mockMvc.perform(patch("/scooter-rental/users/" + user1.getUserId() + "/change-user-data")
+                        .with(authentication(auth))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.type").value("UsernameAlreadyExistsException"));
+    }
+
+    @Test
+    void shouldThrowValueLessZeroExceptionWhenChangeAge() throws Exception {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword(passwordEncoder.encode("password"));
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setAge(20);
+        user.setBalance(new BigDecimal(1000));
+        user.setBanReason(BanReason.NONE);
+        user.setRole(Role.ROLE_USER);
+        userDao.create(user);
+
+        String body = """
+                {
+                    "username": "newUsername",
+                    "firstName": "newFirstName",
+                    "lastName": "newLastName",
+                    "age": -24
+                }
+                """;
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+
+        mockMvc.perform(patch("/scooter-rental/users/" + user.getUserId() + "/change-user-data")
+                        .with(authentication(auth))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("ValueLessZeroException"));
     }
 
     @Test
@@ -180,94 +246,6 @@ public class UserIntegrationTest extends IntegrationTestBase {
                         .with(authentication(auth)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.type").value("PasswordMismatchException"));
-    }
-
-    @Test
-    void shouldChangeFirstName() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword(passwordEncoder.encode("password"));
-        user.setFirstName("Test");
-        user.setLastName("User");
-        user.setAge(20);
-        user.setBalance(new BigDecimal(1000));
-        user.setBanReason(BanReason.NONE);
-        user.setRole(Role.ROLE_USER);
-        userDao.create(user);
-
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-
-        mockMvc.perform(patch("/scooter-rental/users/" + user.getUserId() + "/change-first-name")
-                        .param("newFirstName", "Ivan")
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.firstName").value("Ivan"));
-    }
-
-    @Test
-    void shouldChangeLastName() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword(passwordEncoder.encode("password"));
-        user.setFirstName("Test");
-        user.setLastName("User");
-        user.setAge(20);
-        user.setBalance(new BigDecimal(1000));
-        user.setBanReason(BanReason.NONE);
-        user.setRole(Role.ROLE_USER);
-        userDao.create(user);
-
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-
-        mockMvc.perform(patch("/scooter-rental/users/" + user.getUserId() + "/change-last-name")
-                        .param("newLastName", "Ivanov")
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.lastName").value("Ivanov"));
-    }
-
-    @Test
-    void shouldChangeAge() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword(passwordEncoder.encode("password"));
-        user.setFirstName("Test");
-        user.setLastName("User");
-        user.setAge(20);
-        user.setBalance(new BigDecimal(1000));
-        user.setBanReason(BanReason.NONE);
-        user.setRole(Role.ROLE_USER);
-        userDao.create(user);
-
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-
-        mockMvc.perform(patch("/scooter-rental/users/" + user.getUserId() + "/change-age")
-                        .param("newAge", "25")
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.age").value(25));
-    }
-
-    @Test
-    void shouldThrowValueLessZeroExceptionWhenChangeAge() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword(passwordEncoder.encode("password"));
-        user.setFirstName("Test");
-        user.setLastName("User");
-        user.setAge(20);
-        user.setBalance(new BigDecimal(1000));
-        user.setBanReason(BanReason.NONE);
-        user.setRole(Role.ROLE_USER);
-        userDao.create(user);
-
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
-
-        mockMvc.perform(patch("/scooter-rental/users/" + user.getUserId() + "/change-age")
-                        .param("newAge", "-5")
-                        .with(authentication(auth)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.type").value("ValueLessZeroException"));
     }
 
     @Test

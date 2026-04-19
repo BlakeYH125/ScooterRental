@@ -8,6 +8,7 @@ import org.scooterrental.model.entity.Trip;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.PaymentType;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.Role;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.enums.TripStatus;
@@ -68,7 +69,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         userDao.create(user);
 
         RentalPoint point = new RentalPoint();
-        point.setLocation("Москва");
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(point);
 
         Scooter scooter = new Scooter();
@@ -157,7 +159,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         userDao.create(user);
 
         RentalPoint point = new RentalPoint();
-        point.setLocation("Москва");
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(point);
 
         Scooter scooter = new Scooter();
@@ -227,7 +230,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         userDao.create(user);
 
         RentalPoint point = new RentalPoint();
-        point.setLocation("Москва");
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(point);
 
         Scooter scooter = new Scooter();
@@ -279,7 +283,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         userDao.create(user);
 
         RentalPoint point = new RentalPoint();
-        point.setLocation("Москва");
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(point);
 
         Scooter scooter = new Scooter();
@@ -329,7 +334,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         userDao.create(user);
 
         RentalPoint point = new RentalPoint();
-        point.setLocation("Москва");
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(point);
 
         Scooter scooter = new Scooter();
@@ -373,7 +379,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         userDao.create(user);
 
         RentalPoint point = new RentalPoint();
-        point.setLocation("Москва");
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(point);
 
         Scooter scooter = new Scooter();
@@ -417,7 +424,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         userDao.create(user);
 
         RentalPoint point = new RentalPoint();
-        point.setLocation("Москва");
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(point);
 
         Scooter scooter = new Scooter();

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserResponseDto;
+import org.scooterrental.service.dto.UserUpdateDto;
 import org.scooterrental.service.serviceinterface.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,40 +31,19 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PatchMapping("/{userId}/change-username")
+    @PatchMapping("/{userId}/change-user-data")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN') and authentication.principal.userId == #userId")
-    public ResponseEntity<UserResponseDto> changeUsername(@PathVariable("userId") Long userId, @RequestParam("newUsername") String newUsername) {
-        logger.info("Получен запрос на изменение имени пользователя у пользователя {}", userId);
-        return ResponseEntity.ok().body(userService.changeUsername(userId, newUsername));
+    public ResponseEntity<UserResponseDto> changeUserData(@PathVariable("userId") Long userId, @RequestBody UserUpdateDto userUpdateDto) {
+        logger.info("Получен запрос на изменение личных данных пользователя {}", userId);
+        return ResponseEntity.ok().body(userService.changeUserData(userId, userUpdateDto));
     }
 
     @PatchMapping("/{userId}/change-password")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN') and authentication.principal.userId == #userId")
     public ResponseEntity<String> changePassword(@PathVariable("userId") Long userId, @Valid @RequestBody ChangePasswordDto changePasswordDto) {
-        userService.changePassword(userId, changePasswordDto);
         logger.info("Получен запрос на изменение пароль у пользователя {}", userId);
+        userService.changePassword(userId, changePasswordDto);
         return ResponseEntity.ok().body("Смена пароля успешна");
-    }
-
-    @PatchMapping("/{userId}/change-first-name")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN') and authentication.principal.userId == #userId")
-    public ResponseEntity<UserResponseDto> changeFirstName(@PathVariable("userId") Long userId, @RequestParam("newFirstName") String newFirstName) {
-        logger.info("Получен запрос на изменение имени у пользователя {}", userId);
-        return ResponseEntity.ok().body(userService.changeFirstName(userId, newFirstName));
-    }
-
-    @PatchMapping("/{userId}/change-last-name")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN') and authentication.principal.userId == #userId")
-    public ResponseEntity<UserResponseDto> changeLastName(@PathVariable("userId") Long userId, @RequestParam("newLastName") String newLastName) {
-        logger.info("Получен запрос на изменение фамилии у пользователя {}", userId);
-        return ResponseEntity.ok().body(userService.changeLastName(userId, newLastName));
-    }
-
-    @PatchMapping("/{userId}/change-age")
-    @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN') and authentication.principal.userId == #userId")
-    public ResponseEntity<UserResponseDto> changeAge(@PathVariable("userId") Long userId, @RequestParam("newAge") int newAge) {
-        logger.info("Получен запрос на изменение возраста у пользователя {}", userId);
-        return ResponseEntity.ok().body(userService.changeAge(userId, newAge));
     }
 
     @PatchMapping("/{userId}/ban")

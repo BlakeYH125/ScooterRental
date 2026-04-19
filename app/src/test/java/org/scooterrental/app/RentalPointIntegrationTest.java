@@ -2,6 +2,7 @@ package org.scooterrental.app;
 
 import org.junit.jupiter.api.Test;
 import org.scooterrental.model.entity.RentalPoint;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.repository.daointerface.RentalPointDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,7 +31,8 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
     void shouldCreateRentalPoint() throws Exception {
         String body = """
                 {
-                    "location": "Москва"
+                    "location": "Москва",
+                    "rentalPointType": "CITY"
                 }
                 """;
         mockMvc.perform(post("/scooter-rental/rental-points/add")
@@ -45,7 +47,8 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
     void shouldThrowForbiddenStatusWhenAdd() throws Exception {
         String body = """
                 {
-                    "location": "Москва"
+                    "location": "Москва",
+                    "rentalPointType": "CITY"
                 }
                 """;
         mockMvc.perform(post("/scooter-rental/rental-points/add")
@@ -76,6 +79,7 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
 
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation("Москва");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
         rentalPointDao.create(rentalPoint);
         Long generatedId = rentalPoint.getRentalPointId();
 
@@ -92,6 +96,7 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
 
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation("Москва");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
         rentalPointDao.create(rentalPoint);
 
         mockMvc.perform(patch("/scooter-rental/rental-points/" + 999L + "/set-new-location")
@@ -104,12 +109,14 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
     @WithMockUser(roles = "ADMIN")
     void shouldUpdateParentPointId() throws Exception {
         RentalPoint rentalPoint = new RentalPoint();
-        rentalPoint.setLocation("Москва");
+        rentalPoint.setLocation("ЦАО");
+        rentalPoint.setRentalPointType(RentalPointType.DISTRICT);
         rentalPointDao.create(rentalPoint);
         Long generatedId = rentalPoint.getRentalPointId();
 
         RentalPoint newParentPoint = new RentalPoint();
-        newParentPoint.setLocation("Химки");
+        newParentPoint.setLocation("Москва");
+        newParentPoint.setRentalPointType(RentalPointType.CITY);
         rentalPointDao.create(newParentPoint);
         Long generatedIdParent = newParentPoint.getRentalPointId();
 
@@ -121,9 +128,31 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
 
     @Test
     @WithMockUser(roles = "ADMIN")
+    void shouldThrowInvalidHierarchyException() throws Exception {
+        RentalPoint rentalPoint = new RentalPoint();
+        rentalPoint.setLocation("Химки");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
+        rentalPointDao.create(rentalPoint);
+        Long generatedId = rentalPoint.getRentalPointId();
+
+        RentalPoint newParentPoint = new RentalPoint();
+        newParentPoint.setLocation("Москва");
+        newParentPoint.setRentalPointType(RentalPointType.CITY);
+        rentalPointDao.create(newParentPoint);
+        Long generatedIdParent = newParentPoint.getRentalPointId();
+
+        mockMvc.perform(patch("/scooter-rental/rental-points/" + generatedId + "/set-new-parent-point-id")
+                        .param("newParentPointId", generatedIdParent.toString()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("InvalidHierarchyException"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
     void shouldDeleteRentalPoint() throws Exception {
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation("Москва");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
         rentalPointDao.create(rentalPoint);
 
         Long generatedId = rentalPoint.getRentalPointId();
@@ -140,6 +169,7 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
     void shouldReturnDto() throws Exception {
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation("Москва");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
         rentalPointDao.create(rentalPoint);
         Long generatedId = rentalPoint.getRentalPointId();
 
@@ -152,6 +182,7 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
     void shouldThrowUnauthorized() throws Exception {
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation("Москва");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
         rentalPointDao.create(rentalPoint);
         Long generatedId = rentalPoint.getRentalPointId();
 
@@ -164,10 +195,46 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
     void shouldReturnListDto() throws Exception {
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation("Москва");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
         rentalPointDao.create(rentalPoint);
 
         mockMvc.perform(get("/scooter-rental/rental-points"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].location").value("Москва"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void shouldReturnRentalStationsByParentId() throws Exception {
+        RentalPoint city = new RentalPoint();
+        city.setLocation("Москва");
+        city.setRentalPointType(RentalPointType.CITY);
+        rentalPointDao.create(city);
+
+        RentalPoint district = new RentalPoint();
+        district.setLocation("ЦАО");
+        district.setRentalPointType(RentalPointType.DISTRICT);
+        district.setParentPoint(city);
+        rentalPointDao.create(district);
+        city.getChildPoints().add(district);
+
+        RentalPoint street = new RentalPoint();
+        street.setLocation("ул. Пушкина");
+        street.setRentalPointType(RentalPointType.STREET);
+        street.setParentPoint(district);
+        rentalPointDao.create(street);
+        district.getChildPoints().add(street);
+
+        RentalPoint building = new RentalPoint();
+        building.setLocation("д. 10");
+        building.setRentalPointType(RentalPointType.BUILDING);
+        building.setParentPoint(street);
+        rentalPointDao.create(building);
+        street.getChildPoints().add(building);
+
+        mockMvc.perform(get("/scooter-rental/rental-points/" + city.getRentalPointId() + "/rental-stations"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].location").value("ул. Пушкина, д. 10"));
     }
 }

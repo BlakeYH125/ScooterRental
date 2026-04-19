@@ -2,7 +2,9 @@ package org.scooterrental.service.serviceimpl;
 
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
+import org.scooterrental.model.exception.InvalidHierarchyException;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
 import org.scooterrental.model.exception.ScooterNotFoundException;
 import org.scooterrental.model.exception.ScooterAlreadyInRentException;
@@ -85,6 +87,9 @@ public class ScooterServiceImpl implements ScooterService {
         RentalPoint rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
         if (rentalPoint == null) {
             throw new RentalPointNotFoundException();
+        }
+        if (rentalPoint.getRentalPointType() != RentalPointType.BUILDING) {
+            throw new InvalidHierarchyException("Самокат можно оставить только у здания");
         }
         scooter.setRentalPoint(rentalPoint);
         scooter.setScooterStatus(ScooterStatus.AVAILABLE);

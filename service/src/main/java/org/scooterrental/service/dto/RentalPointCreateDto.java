@@ -1,9 +1,14 @@
 package org.scooterrental.service.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import org.scooterrental.model.enums.RentalPointType;
 
 public class RentalPointCreateDto {
+
+    @NotNull(message = "Тип точки аренды обязателен")
+    private RentalPointType rentalPointType;
 
     @NotBlank(message = "Локация обязательная")
     private String location;
@@ -12,6 +17,14 @@ public class RentalPointCreateDto {
     private Long parentPointId;
 
     public RentalPointCreateDto() {
+    }
+
+    public RentalPointType getRentalPointType() {
+        return rentalPointType;
+    }
+
+    public void setRentalPointType(RentalPointType rentalPointType) {
+        this.rentalPointType = rentalPointType;
     }
 
     public String getLocation() {

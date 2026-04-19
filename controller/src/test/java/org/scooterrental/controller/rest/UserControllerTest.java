@@ -13,6 +13,7 @@ import org.scooterrental.model.exception.ValueLessZeroException;
 import org.scooterrental.model.exception.PasswordMismatchException;
 import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserResponseDto;
+import org.scooterrental.service.dto.UserUpdateDto;
 import org.scooterrental.service.serviceinterface.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,7 +33,6 @@ import java.util.List;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -66,9 +66,16 @@ public class UserControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void changeUsername_ShouldReturn200AndDto_WhenUserRequestsForSelfAndAllCorrect() throws Exception {
+    void changeUserData_ShouldReturn200AndDto_WhenUserRequestsForSelfAndAllCorrect() throws Exception {
         Long userId = 1L;
-        String newUsername = "newUsername";
+        String body = """
+                    {
+                    "username": "newUsername",
+                    "firstName": "Вася",
+                    "lastName": "Иванов",
+                    "age": 25
+                    }
+                """;
         User customUser = new User();
         customUser.setUserId(userId);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
@@ -76,131 +83,208 @@ public class UserControllerTest {
 
         UserResponseDto expected = new UserResponseDto();
         expected.setUserId(userId);
-        expected.setUsername(newUsername);
+        expected.setUsername("newUsername");
+        expected.setFirstName("Вася");
+        expected.setLastName("Иванов");
+        expected.setAge(25);
 
-        when(userService.changeUsername(userId, newUsername)).thenReturn(expected);
+        when(userService.changeUserData(eq(userId), any(UserUpdateDto.class))).thenReturn(expected);
 
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-username", userId)
-                        .param("newUsername", newUsername)
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
                         .with(csrf())
                         .with(authentication(auth)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.username").value(newUsername));
+                .andExpect(jsonPath("$.username").value("newUsername"))
+                .andExpect(jsonPath("$.firstName").value("Вася"))
+                .andExpect(jsonPath("$.lastName").value("Иванов"))
+                .andExpect(jsonPath("$.age").value(25));
 
-        verify(userService, times(1)).changeUsername(userId, newUsername);
+        verify(userService, times(1)).changeUserData(eq(userId), any(UserUpdateDto.class));
     }
 
     @Test
-    void changeUsername_ShouldReturn403_WhenUserRequestsForOther() throws Exception {
+    void changeUserData_ShouldReturn403_WhenUserRequestsForOther() throws Exception {
         Long userId = 1L;
         Long otherUserId = 2L;
-        String newUsername = "newUsername";
+        String body = """
+                    {
+                    "username": "newUsername",
+                    "firstName": "Вася",
+                    "lastName": "Иванов",
+                    "age": 25
+                    }
+                """;
         User customUser = new User();
         customUser.setUserId(userId);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
 
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-username", otherUserId)
-                        .param("newUsername", newUsername)
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", otherUserId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
                         .with(csrf())
                         .with(authentication(auth)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.type").value("AccessDeniedException"));
 
-        verify(userService, never()).changeUsername(anyLong(), anyString());
+        verify(userService, never()).changeUserData(anyLong(), any());
     }
 
     @Test
-    void changeUsername_ShouldReturn403_WhenAdminRequestsForOther() throws Exception {
+    void changeUserData_ShouldReturn403_WhenAdminRequestsForOther() throws Exception {
         Long adminId = 1L;
         Long otherUserId = 2L;
-        String newUsername = "newUsername";
+        String body = """
+                    {
+                    "username": "newUsername",
+                    "firstName": "Вася",
+                    "lastName": "Иванов",
+                    "age": 25
+                    }
+                """;
         User customUser = new User();
         customUser.setUserId(adminId);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
 
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-username", otherUserId)
-                        .param("newUsername", newUsername)
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", otherUserId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
                         .with(csrf())
                         .with(authentication(auth)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.type").value("AccessDeniedException"));
 
-        verify(userService, never()).changeUsername(anyLong(), anyString());
+        verify(userService, never()).changeUserData(anyLong(), any());
     }
 
     @Test
-    void changeUsername_ShouldReturn401_WhenNonameRequests() throws Exception {
+    void changeUserData_ShouldReturn401_WhenNonameRequests() throws Exception {
         Long userId = 1L;
-        String newUsername = "newUsername";
+        String body = """
+                    {
+                    "username": "newUsername",
+                    "firstName": "Вася",
+                    "lastName": "Иванов",
+                    "age": 25
+                    }
+                """;
 
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-username", userId)
-                        .param("newUsername", newUsername)
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());
 
-        verify(userService, never()).changeUsername(anyLong(), anyString());
+        verify(userService, never()).changeUserData(anyLong(), any());
     }
 
     @Test
-    void changeUsername_ShouldReturn404_WhenUserNotFound() throws Exception {
+    void changeUserData_ShouldReturn404_WhenUserNotFound() throws Exception {
         Long userId = 1L;
-        String newUsername = "newUsername";
+        String body = """
+                    {
+                    "username": "newUsername",
+                    "firstName": "Вася",
+                    "lastName": "Иванов",
+                    "age": 25
+                    }
+                """;
         User customUser = new User();
         customUser.setUserId(userId);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
 
-        when(userService.changeUsername(userId, newUsername)).thenThrow(new UserNotFoundException());
+        when(userService.changeUserData(eq(userId), any(UserUpdateDto.class))).thenThrow(new UserNotFoundException());
 
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-username", userId)
-                        .param("newUsername", newUsername)
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
                         .with(csrf())
                         .with(authentication(auth)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.type").value("UserNotFoundException"));
 
-        verify(userService, times(1)).changeUsername(userId, newUsername);
+        verify(userService, times(1)).changeUserData(eq(userId), any(UserUpdateDto.class));
     }
 
     @Test
-    void changeUsername_ShouldReturn409_WhenUsernameAlreadyExists() throws Exception {
+    void changeUserData_ShouldReturn409_WhenUsernameAlreadyExists() throws Exception {
         Long userId = 1L;
-        String newUsername = "newUsername";
+        String body = """
+                    {
+                    "username": "newUsername",
+                    "firstName": "Вася",
+                    "lastName": "Иванов",
+                    "age": 25
+                    }
+                """;
         User customUser = new User();
         customUser.setUserId(userId);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
 
-        when(userService.changeUsername(userId, newUsername)).thenThrow(new UsernameAlreadyExistsException());
+        when(userService.changeUserData(eq(userId), any(UserUpdateDto.class))).thenThrow(new UsernameAlreadyExistsException());
 
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-username", userId)
-                        .param("newUsername", newUsername)
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
                         .with(csrf())
                         .with(authentication(auth)))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.type").value("UsernameAlreadyExistsException"));
 
-        verify(userService, times(1)).changeUsername(userId, newUsername);
+        verify(userService, times(1)).changeUserData(eq(userId), any(UserUpdateDto.class));
     }
 
     @Test
-    void changeUsername_ShouldReturn400_WhenMissingRequestParam() throws Exception {
+    void changeUserData_ShouldReturn400_WhenValueLessZero() throws Exception {
+        Long userId = 1L;
+        String body = """
+                    {
+                    "username": "newUsername",
+                    "firstName": "Вася",
+                    "lastName": "Иванов",
+                    "age": 25
+                    }
+                """;
+        User customUser = new User();
+        customUser.setUserId(userId);
+        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
+
+        when(userService.changeUserData(eq(userId), any(UserUpdateDto.class))).thenThrow(new ValueLessZeroException());
+
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body)
+                        .with(csrf())
+                        .with(authentication(auth)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("ValueLessZeroException"));
+
+        verify(userService, times(1)).changeUserData(eq(userId), any(UserUpdateDto.class));
+    }
+
+    @Test
+    void changeUserData_ShouldReturn400_WhenMissingRequestBody() throws Exception {
         Long userId = 1L;
         User customUser = new User();
         customUser.setUserId(userId);
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
 
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-username", userId)
+        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-user-data", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf())
                         .with(authentication(auth)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.type").value("MissingServletRequestParameterException"));
+                .andExpect(jsonPath("$.type").value("HttpMessageNotReadableException"));
 
-        verify(userService, never()).changeUsername(anyLong(), anyString());
+        verify(userService, never()).changeUserData(anyLong(), any());
     }
 
     @Test
@@ -355,378 +439,6 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.type").value("HttpMessageNotReadableException"));
 
         verify(userService, never()).changePassword(anyLong(), any(ChangePasswordDto.class));
-    }
-
-    @Test
-    void changeFirstName_ShouldReturn200AndDto_WhenUserRequestsForSelfAndAllCorrect() throws Exception {
-        Long userId = 1L;
-        String newFirstName = "Вася";
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        UserResponseDto expected = new UserResponseDto();
-        expected.setUserId(userId);
-        expected.setFirstName(newFirstName);
-
-        when(userService.changeFirstName(userId, newFirstName)).thenReturn(expected);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-first-name", userId)
-                        .param("newFirstName", newFirstName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.firstName").value(newFirstName));
-
-        verify(userService, times(1)).changeFirstName(userId, newFirstName);
-    }
-
-    @Test
-    void changeFirstName_ShouldReturn403_WhenUserRequestsForOther() throws Exception {
-        Long userId = 1L;
-        Long otherUserId = 2L;
-        String newFirstName = "Вася";
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-first-name", otherUserId)
-                        .param("newFirstName", newFirstName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("AccessDeniedException"));
-
-        verify(userService, never()).changeFirstName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeFirstName_ShouldReturn403_WhenAdminRequestsForOther() throws Exception {
-        Long adminId = 1L;
-        Long otherUserId = 2L;
-        String newFirstName = "Вася";
-        User customUser = new User();
-        customUser.setUserId(adminId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-first-name", otherUserId)
-                        .param("newFirstName", newFirstName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("AccessDeniedException"));
-
-        verify(userService, never()).changeFirstName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeFirstName_ShouldReturn401_WhenNonameRequests() throws Exception {
-        Long userId = 1L;
-        String newFirstName = "Вася";
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-first-name", userId)
-                        .param("newFirstName", newFirstName)
-                        .with(csrf()))
-                .andExpect(status().isUnauthorized());
-
-        verify(userService, never()).changeFirstName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeFirstName_ShouldReturn404_WhenUserNotFound() throws Exception {
-        Long userId = 1L;
-        String newFirstName = "Вася";
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        when(userService.changeFirstName(userId, newFirstName)).thenThrow(new UserNotFoundException());
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-first-name", userId)
-                        .param("newFirstName", newFirstName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.type").value("UserNotFoundException"));
-
-        verify(userService, times(1)).changeFirstName(userId, newFirstName);
-    }
-
-    @Test
-    void changeFirstName_ShouldReturn400_WhenMissingRequestParam() throws Exception {
-        Long userId = 1L;
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-first-name", userId)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.type").value("MissingServletRequestParameterException"));
-
-        verify(userService, never()).changeFirstName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeLastName_ShouldReturn200AndDto_WhenUserRequestsForSelfAndAllCorrect() throws Exception {
-        Long userId = 1L;
-        String newLastName = "Иванов";
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        UserResponseDto expected = new UserResponseDto();
-        expected.setUserId(userId);
-        expected.setLastName(newLastName);
-
-        when(userService.changeLastName(userId, newLastName)).thenReturn(expected);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-last-name", userId)
-                        .param("newLastName", newLastName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.lastName").value(newLastName));
-
-        verify(userService, times(1)).changeLastName(userId, newLastName);
-    }
-
-    @Test
-    void changeLastName_ShouldReturn403_WhenUserRequestsForOther() throws Exception {
-        Long userId = 1L;
-        Long otherUserId = 2L;
-        String newLastName = "Иванов";
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-last-name", otherUserId)
-                        .param("newLastName", newLastName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("AccessDeniedException"));
-
-        verify(userService, never()).changeLastName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeLastName_ShouldReturn403_WhenAdminRequestsForOther() throws Exception {
-        Long adminId = 1L;
-        Long otherUserId = 2L;
-        String newLastName = "Иванов";
-        User customUser = new User();
-        customUser.setUserId(adminId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-last-name", otherUserId)
-                        .param("newLastName", newLastName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("AccessDeniedException"));
-
-        verify(userService, never()).changeLastName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeLastName_ShouldReturn401_WhenNonameRequests() throws Exception {
-        Long userId = 1L;
-        String newLastName = "Иванов";
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-last-name", userId)
-                        .param("newLastName", newLastName)
-                        .with(csrf()))
-                .andExpect(status().isUnauthorized());
-
-        verify(userService, never()).changeLastName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeLastName_ShouldReturn404_WhenUserNotFound() throws Exception {
-        Long userId = 1L;
-        String newLastName = "Иванов";
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        when(userService.changeLastName(userId, newLastName)).thenThrow(new UserNotFoundException());
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-last-name", userId)
-                        .param("newLastName", newLastName)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.type").value("UserNotFoundException"));
-
-        verify(userService, times(1)).changeLastName(userId, newLastName);
-    }
-
-    @Test
-    void changeLastName_ShouldReturn400_WhenMissingRequestParam() throws Exception {
-        Long userId = 1L;
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-last-name", userId)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.type").value("MissingServletRequestParameterException"));
-
-        verify(userService, never()).changeLastName(anyLong(), anyString());
-    }
-
-    @Test
-    void changeAge_ShouldReturn200AndDto_WhenUserRequestsForSelfAndAllCorrect() throws Exception {
-        Long userId = 1L;
-        int newAge = 25;
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        UserResponseDto expected = new UserResponseDto();
-        expected.setUserId(userId);
-        expected.setAge(newAge);
-
-        when(userService.changeAge(userId, newAge)).thenReturn(expected);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-age", userId)
-                        .param("newAge", String.valueOf(newAge))
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.age").value(newAge));
-
-        verify(userService, times(1)).changeAge(userId, newAge);
-    }
-
-    @Test
-    void changeAge_ShouldReturn403_WhenUserRequestsForOther() throws Exception {
-        Long userId = 1L;
-        Long otherUserId = 2L;
-        int newAge = 25;
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-age", otherUserId)
-                        .param("newAge", String.valueOf(newAge))
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("AccessDeniedException"));
-
-        verify(userService, never()).changeAge(anyLong(), anyInt());
-    }
-
-    @Test
-    void changeAge_ShouldReturn403_WhenAdminRequestsForOther() throws Exception {
-        Long adminId = 1L;
-        Long otherUserId = 2L;
-        int newAge = 25;
-        User customUser = new User();
-        customUser.setUserId(adminId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-age", otherUserId)
-                        .param("newAge", String.valueOf(newAge))
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.type").value("AccessDeniedException"));
-
-        verify(userService, never()).changeAge(anyLong(), anyInt());
-    }
-
-    @Test
-    void changeAge_ShouldReturn401_WhenNonameRequests() throws Exception {
-        Long userId = 1L;
-        int newAge = 25;
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-age", userId)
-                        .param("newAge", String.valueOf(newAge))
-                        .with(csrf()))
-                .andExpect(status().isUnauthorized());
-
-        verify(userService, never()).changeAge(anyLong(), anyInt());
-    }
-
-    @Test
-    void changeAge_ShouldReturn404_WhenUserNotFound() throws Exception {
-        Long userId = 1L;
-        int newAge = 25;
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        when(userService.changeAge(userId, newAge)).thenThrow(new UserNotFoundException());
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-age", userId)
-                        .param("newAge", String.valueOf(newAge))
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.type").value("UserNotFoundException"));
-
-        verify(userService, times(1)).changeAge(userId, newAge);
-    }
-
-    @Test
-    void changeAge_ShouldReturn400_WhenValueLessZero() throws Exception {
-        Long userId = 1L;
-        int newAge = -5;
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        when(userService.changeAge(userId, newAge)).thenThrow(new ValueLessZeroException());
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-age", userId)
-                        .param("newAge", String.valueOf(newAge))
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.type").value("ValueLessZeroException"));
-
-        verify(userService, times(1)).changeAge(userId, newAge);
-    }
-
-    @Test
-    void changeAge_ShouldReturn400_WhenMissingRequestParam() throws Exception {
-        Long userId = 1L;
-        User customUser = new User();
-        customUser.setUserId(userId);
-        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(customUser, null, authorities);
-
-        mockMvc.perform(patch("/scooter-rental/users/{userId}/change-age", userId)
-                        .with(csrf())
-                        .with(authentication(auth)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.type").value("MissingServletRequestParameterException"));
-
-        verify(userService, never()).changeAge(anyLong(), anyInt());
     }
 
     @Test

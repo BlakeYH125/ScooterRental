@@ -3,6 +3,7 @@ package org.scooterrental.app;
 import org.junit.jupiter.api.Test;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.repository.daointerface.RentalPointDao;
 import org.scooterrental.repository.daointerface.ScooterDao;
@@ -102,6 +103,7 @@ public class ScooterIntegrationTest extends IntegrationTestBase {
     void shouldPutScooterInUse() throws Exception {
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation("Парк Горького");
+        rentalPoint.setRentalPointType(RentalPointType.BUILDING);
         rentalPointDao.create(rentalPoint);
         Long pointId = rentalPoint.getRentalPointId();
 

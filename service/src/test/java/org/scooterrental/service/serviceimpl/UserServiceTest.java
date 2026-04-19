@@ -17,6 +17,7 @@ import org.scooterrental.model.exception.PasswordMismatchException;
 import org.scooterrental.repository.daointerface.UserDao;
 import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserResponseDto;
+import org.scooterrental.service.dto.UserUpdateDto;
 import org.scooterrental.service.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -51,24 +52,36 @@ public class UserServiceTest {
     private UserServiceImpl userService;
 
     @Test
-    void changeUserName_ShouldReturnDto_WhenAllCorrect() {
+    void changeUserData_ShouldReturnDto_WhenAllCorrect() {
         Long userId = 1L;
-        String newUsername = "abc";
+
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setLastName("Петров");
+        userUpdateDto.setUsername("PETROV");
+        userUpdateDto.setFirstName("Петр");
+        userUpdateDto.setAge(24);
 
         User user = new User();
         user.setUserId(userId);
 
         UserResponseDto expected = new UserResponseDto();
         expected.setUserId(userId);
-        expected.setUsername(newUsername);
+        expected.setUsername("Петров");
+        expected.setUsername("PETROV");
+        expected.setFirstName("Петр");
+        expected.setAge(24);
 
         when(userDao.findUserById(userId)).thenReturn(user);
+        when(userDao.findUserByUsername("PETROV")).thenReturn(null);
         when(userMapper.toUserDto(user)).thenReturn(expected);
 
-        UserResponseDto actual = userService.changeUsername(userId, newUsername);
+        UserResponseDto actual = userService.changeUserData(userId, userUpdateDto);
 
         assertNotNull(actual);
         assertEquals(expected.getUsername(), actual.getUsername());
+        assertEquals(expected.getAge(), actual.getAge());
+        assertEquals(expected.getLastName(), actual.getLastName());
+        assertEquals(expected.getFirstName(), actual.getFirstName());
 
         verify(userDao, times(1)).findUserById(userId);
         verify(userDao, times(1)).update(user);
@@ -76,13 +89,18 @@ public class UserServiceTest {
     }
 
     @Test
-    void changeUserName_ShouldThrowUserNotFoundException_WhenUserNotFound() {
+    void changeUserData_ShouldThrowUserNotFoundException_WhenUserNotFound() {
         Long userId = 1L;
-        String newUsername = "abc";
+
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setLastName("Петров");
+        userUpdateDto.setUsername("PETROV");
+        userUpdateDto.setFirstName("Петр");
+        userUpdateDto.setAge(24);
 
         when(userDao.findUserById(userId)).thenReturn(null);
 
-        assertThrows(UserNotFoundException.class, () -> userService.changeUsername(userId, newUsername));
+        assertThrows(UserNotFoundException.class, () -> userService.changeUserData(userId, userUpdateDto));
 
         verify(userDao, times(1)).findUserById(userId);
         verify(userDao, never()).update(any(User.class));
@@ -90,26 +108,90 @@ public class UserServiceTest {
     }
 
     @Test
-    void changeUserName_ShouldThrowUsernameAlreadyExists_WhenUserWithSameUsernameExists() {
+    void changeUserData_ShouldThrowUsernameAlreadyExists_WhenUserWithSameUsernameExists() {
         Long userId1 = 1L;
         Long userId2 = 2L;
-        String newUsername = "abc";
+
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setLastName("Петров");
+        userUpdateDto.setUsername("PETROV");
+        userUpdateDto.setFirstName("Петр");
+        userUpdateDto.setAge(24);
 
         User user1 = new User();
         user1.setUserId(userId1);
 
         User user2 = new User();
         user2.setUserId(userId2);
-        user2.setUsername(newUsername);
+        user2.setUsername("Петров");
 
         when(userDao.findUserById(userId1)).thenReturn(user1);
-        when(userDao.findUserByUsername(newUsername)).thenReturn(user2);
+        when(userDao.findUserByUsername("PETROV")).thenReturn(user2);
 
-        assertThrows(UsernameAlreadyExistsException.class, () -> userService.changeUsername(userId1, newUsername));
+        assertThrows(UsernameAlreadyExistsException.class, () -> userService.changeUserData(userId1, userUpdateDto));
 
         verify(userDao, times(1)).findUserById(userId1);
         verify(userDao, never()).update(any(User.class));
         verify(userMapper, never()).toUserDto(any(User.class));
+    }
+
+    @Test
+    void changeUserData_ShouldThrowValueLessZeroException_WhenAgeNegative() {
+        Long userId = 1L;
+
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setLastName("Петров");
+        userUpdateDto.setUsername("PETROV");
+        userUpdateDto.setFirstName("Петр");
+        userUpdateDto.setAge(-24);
+
+        User user = new User();
+        user.setUserId(userId);
+
+        when(userDao.findUserById(userId)).thenReturn(user);
+        when(userDao.findUserByUsername("PETROV")).thenReturn(null);
+
+        assertThrows(ValueLessZeroException.class, () -> userService.changeUserData(userId, userUpdateDto));
+
+        verify(userDao, times(1)).findUserById(userId);
+        verify(userDao, never()).update(any(User.class));
+        verify(userMapper, never()).toUserDto(any(User.class));
+    }
+
+    @Test
+    void changeUserData_ShouldReturnDto_WhenNotAllParamsInDto() {
+        Long userId = 1L;
+
+        UserUpdateDto userUpdateDto = new UserUpdateDto();
+        userUpdateDto.setLastName("Петров");
+        userUpdateDto.setUsername("PETROV");
+        userUpdateDto.setAge(24);
+
+        User user = new User();
+        user.setUserId(userId);
+        user.setFirstName("Василий");
+
+        UserResponseDto expected = new UserResponseDto();
+        expected.setUserId(userId);
+        expected.setFirstName("Василий");
+        expected.setLastName("Петров");
+        expected.setUsername("PETROV");
+        expected.setAge(24);
+
+        when(userDao.findUserById(userId)).thenReturn(user);
+        when(userMapper.toUserDto(user)).thenReturn(expected);
+
+        UserResponseDto actual = userService.changeUserData(userId, userUpdateDto);
+
+        assertNotNull(actual);
+        assertEquals(expected.getFirstName(), actual.getFirstName());
+        assertEquals(expected.getLastName(), actual.getLastName());
+        assertEquals(expected.getAge(), actual.getAge());
+        assertEquals(expected.getUsername(), actual.getUsername());
+
+        verify(userDao, times(1)).findUserById(userId);
+        verify(userDao, times(1)).update(any(User.class));
+        verify(userMapper, times(1)).toUserDto(any(User.class));
     }
 
     @Test
@@ -154,140 +236,6 @@ public class UserServiceTest {
         verify(passwordEncoder, times(1)).matches(any(), any());
         verify(passwordEncoder, never()).encode(any());
         verify(userDao, never()).update(user);
-    }
-
-    @Test
-    void changeFirstName_ShouldReturnDto_WhenAllCorrect() {
-        Long userId = 1L;
-        String newFirstName = "Вася";
-
-        User user = new User();
-        user.setUserId(userId);
-
-        UserResponseDto expected = new UserResponseDto();
-        expected.setUserId(userId);
-        expected.setFirstName(newFirstName);
-
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(userMapper.toUserDto(user)).thenReturn(expected);
-
-        UserResponseDto actual = userService.changeFirstName(userId, newFirstName);
-
-        assertNotNull(actual);
-        assertEquals(expected.getFirstName(), actual.getFirstName());
-
-        verify(userDao, times(1)).findUserById(userId);
-        verify(userDao, times(1)).update(any(User.class));
-        verify(userMapper, times(1)).toUserDto(any(User.class));
-    }
-
-    @Test
-    void changeFirstName_ShouldThrowUserNotFoundException_WhenUserNotFound() {
-        Long userId = 1L;
-        String newFirstName = "Вася";
-
-        when(userDao.findUserById(userId)).thenReturn(null);
-
-        assertThrows(UserNotFoundException.class, () -> userService.changeFirstName(userId, newFirstName));
-
-        verify(userDao, times(1)).findUserById(userId);
-        verify(userDao, never()).update(any(User.class));
-        verify(userMapper, never()).toUserDto(any(User.class));
-    }
-
-    @Test
-    void changeLastName_ShouldReturnDto_WhenAllCorrect() {
-        Long userId = 1L;
-        String newLastName = "Петров";
-
-        User user = new User();
-        user.setUserId(userId);
-
-        UserResponseDto expected = new UserResponseDto();
-        expected.setUserId(userId);
-        expected.setLastName(newLastName);
-
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(userMapper.toUserDto(user)).thenReturn(expected);
-
-        UserResponseDto actual = userService.changeLastName(userId, newLastName);
-
-        assertNotNull(actual);
-        assertEquals(expected.getLastName(), actual.getLastName());
-
-        verify(userDao, times(1)).findUserById(userId);
-        verify(userDao, times(1)).update(any(User.class));
-        verify(userMapper, times(1)).toUserDto(any(User.class));
-    }
-
-    @Test
-    void changeLastName_ShouldThrowUserNotFoundException_WhenUserNotFound() {
-        Long userId = 1L;
-        String newLastName = "Петров";
-
-        when(userDao.findUserById(userId)).thenReturn(null);
-
-        assertThrows(UserNotFoundException.class, () -> userService.changeLastName(userId, newLastName));
-
-        verify(userDao, times(1)).findUserById(userId);
-        verify(userDao, never()).update(any(User.class));
-        verify(userMapper, never()).toUserDto(any(User.class));
-    }
-
-    @Test
-    void changeAge_ShouldReturnDto_WhenAllCorrect() {
-        Long userId = 1L;
-        int newAge = 18;
-
-        User user = new User();
-        user.setUserId(userId);
-
-        UserResponseDto expected = new UserResponseDto();
-        expected.setUserId(userId);
-        expected.setAge(newAge);
-
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(userMapper.toUserDto(user)).thenReturn(expected);
-
-        UserResponseDto actual = userService.changeAge(userId, newAge);
-
-        assertNotNull(actual);
-        assertEquals(expected.getAge(), actual.getAge());
-
-        verify(userDao, times(1)).findUserById(userId);
-        verify(userDao, times(1)).update(any(User.class));
-        verify(userMapper, times(1)).toUserDto(any(User.class));
-    }
-
-    @Test
-    void changeAge_ShouldThrowUserNotFoundException_WhenUserNotFound() {
-        Long userId = 1L;
-        int newAge = 18;
-
-        when(userDao.findUserById(userId)).thenReturn(null);
-
-        assertThrows(UserNotFoundException.class, () -> userService.changeAge(userId, newAge));
-
-        verify(userDao, times(1)).findUserById(userId);
-        verify(userDao, never()).update(any(User.class));
-        verify(userMapper, never()).toUserDto(any(User.class));
-    }
-
-    @Test
-    void changeAge_ShouldThrowValueLessZeroException_WhenAgeNegative() {
-        Long userId = 1L;
-        int newAge = -18;
-
-        User user = new User();
-        user.setUserId(userId);
-
-        when(userDao.findUserById(userId)).thenReturn(user);
-
-        assertThrows(ValueLessZeroException.class, () -> userService.changeAge(userId, newAge));
-
-        verify(userDao, times(1)).findUserById(userId);
-        verify(userDao, never()).update(any(User.class));
-        verify(userMapper, never()).toUserDto(any(User.class));
     }
 
     @Test

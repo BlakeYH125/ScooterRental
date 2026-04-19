@@ -3,16 +3,14 @@ package org.scooterrental.service.serviceinterface;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserResponseDto;
+import org.scooterrental.service.dto.UserUpdateDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface UserService {
-    UserResponseDto changeUsername(Long userId, String newUsername);
+    UserResponseDto changeUserData(Long userId, UserUpdateDto userUpdateDto);
     void changePassword(Long userId, ChangePasswordDto changePasswordDto);
-    UserResponseDto changeFirstName(Long userId, String newFirstName);
-    UserResponseDto changeLastName(Long userId, String newLastName);
-    UserResponseDto changeAge(Long userId, int newAge);
     UserResponseDto banAccount(Long userId, BanReason banReason);
     UserResponseDto unbanAccount(Long userId);
     UserResponseDto addMoney(Long userId, BigDecimal amount);

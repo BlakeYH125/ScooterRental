@@ -7,8 +7,10 @@ import org.scooterrental.model.entity.User;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.PaymentType;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.enums.TripStatus;
+import org.scooterrental.model.exception.InvalidHierarchyException;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
 import org.scooterrental.model.exception.ScooterNotFoundException;
 import org.scooterrental.model.exception.ScooterNotAvailableException;
@@ -120,6 +122,9 @@ public class TripServiceImpl implements TripService {
         RentalPoint endRentalPoint = rentalPointDao.findRentalPointById(endRentalPointId);
         if (endRentalPoint == null) {
             throw new RentalPointNotFoundException();
+        }
+        if (endRentalPoint.getRentalPointType() != RentalPointType.BUILDING) {
+            throw new InvalidHierarchyException("Завершить аренду можно только у здания");
         }
         User user = trip.getUser();
         Tariff tariff = trip.getTariff();

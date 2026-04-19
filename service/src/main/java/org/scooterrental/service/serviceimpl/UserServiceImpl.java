@@ -10,6 +10,7 @@ import org.scooterrental.model.exception.UserNotFoundException;
 import org.scooterrental.model.exception.ValueLessZeroException;
 import org.scooterrental.model.exception.PasswordMismatchException;
 import org.scooterrental.service.dto.ChangePasswordDto;
+import org.scooterrental.service.dto.UserUpdateDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,15 +40,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto changeUsername(Long userId, String newUsername) {
+    public UserResponseDto changeUserData(Long userId, UserUpdateDto userUpdateDto) {
         User user = getUserOrThrow(userId);
-        User userCheck = userDao.findUserByUsername(newUsername);
-        if (userCheck != null && !user.getUserId().equals(userCheck.getUserId())) {
-            throw new UsernameAlreadyExistsException();
+        String newUsername = userUpdateDto.getUsername();
+        String newFirstName = userUpdateDto.getFirstName();
+        String newLastName = userUpdateDto.getLastName();
+        Integer newAge = userUpdateDto.getAge();
+        if (newUsername != null) {
+            User userCheck = userDao.findUserByUsername(newUsername);
+            if (userCheck != null && !user.getUserId().equals(userCheck.getUserId())) {
+                throw new UsernameAlreadyExistsException();
+            }
+            user.setUsername(newUsername);
+            logger.info("Пользователь {} успешно изменил имя пользователя", userId);
         }
-        user.setUsername(newUsername);
+        if (newFirstName != null) {
+            user.setFirstName(newFirstName);
+            logger.info("Пользователь {} успешно изменил имя", userId);
+        }
+        if (newLastName != null) {
+            user.setLastName(newLastName);
+            logger.info("Пользователь {} успешно изменил фамилию", userId);
+        }
+        if (newAge != null) {
+            if (newAge < 0) {
+                throw new ValueLessZeroException();
+            }
+            user.setAge(newAge);
+            logger.info("Пользователь {} успешно изменил возраст", userId);
+        }
         userDao.update(user);
-        logger.info("Пользователь {} успешно изменил имя пользователя", userId);
         return userMapper.toUserDto(user);
     }
 
@@ -63,36 +85,6 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new PasswordMismatchException();
         }
-    }
-
-    @Override
-    public UserResponseDto changeFirstName(Long userId, String newFirstName) {
-        User user = getUserOrThrow(userId);
-        user.setFirstName(newFirstName);
-        userDao.update(user);
-        logger.info("Пользователь {} успешно изменил имя", userId);
-        return userMapper.toUserDto(user);
-    }
-
-    @Override
-    public UserResponseDto changeLastName(Long userId, String newLastName) {
-        User user = getUserOrThrow(userId);
-        user.setLastName(newLastName);
-        userDao.update(user);
-        logger.info("Пользователь {} успешно изменил фамилию", userId);
-        return userMapper.toUserDto(user);
-    }
-
-    @Override
-    public UserResponseDto changeAge(Long userId, int newAge) {
-        User user = getUserOrThrow(userId);
-        if (newAge < 0) {
-            throw new ValueLessZeroException();
-        }
-        user.setAge(newAge);
-        userDao.update(user);
-        logger.info("Пользователь {} успешно изменил возраст", userId);
-        return userMapper.toUserDto(user);
     }
 
     @Override

@@ -4,9 +4,11 @@ import java.util.List;
 
 public class RentalPointDetailsDto {
     private Long rentalPointId;
+    private String rentalPointType;
     private String location;
     private boolean deleted;
     private List<ScooterResponseDto> scooters;
+    private List<RentalPointResponseDto> childPoints;
 
     public RentalPointDetailsDto() {
     }
@@ -17,6 +19,14 @@ public class RentalPointDetailsDto {
 
     public void setRentalPointId(Long rentalPointId) {
         this.rentalPointId = rentalPointId;
+    }
+
+    public String getRentalPointType() {
+        return rentalPointType;
+    }
+
+    public void setRentalPointType(String rentalPointType) {
+        this.rentalPointType = rentalPointType;
     }
 
     public String getLocation() {
@@ -41,5 +51,13 @@ public class RentalPointDetailsDto {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public List<RentalPointResponseDto> getChildPoints() {
+        return childPoints;
+    }
+
+    public void setChildPoints(List<RentalPointResponseDto> childPoints) {
+        this.childPoints = childPoints;
     }
 }

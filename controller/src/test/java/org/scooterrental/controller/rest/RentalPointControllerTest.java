@@ -1,5 +1,7 @@
 package org.scooterrental.controller.rest;
 
+import org.scooterrental.model.entity.User;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
 import org.scooterrental.model.exception.SameRentalPointsIDException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +19,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -31,6 +35,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.never;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -66,9 +71,11 @@ public class RentalPointControllerTest {
         RentalPointResponseDto expected = new RentalPointResponseDto();
         expected.setRentalPointId(1L);
         expected.setLocation("Москва");
+        expected.setRentalPointType("BUILDING");
 
         RentalPointCreateDto rentalPointCreateDto = new RentalPointCreateDto();
         rentalPointCreateDto.setLocation("Москва");
+        rentalPointCreateDto.setRentalPointType(RentalPointType.BUILDING);
 
         when(rentalPointService.addNewRentalPoint(any(RentalPointCreateDto.class))).thenReturn(expected);
 
@@ -94,6 +101,7 @@ public class RentalPointControllerTest {
 
         RentalPointCreateDto rentalPointCreateDto = new RentalPointCreateDto();
         rentalPointCreateDto.setLocation("Москва");
+        rentalPointCreateDto.setRentalPointType(RentalPointType.BUILDING);
 
         when(rentalPointService.addNewRentalPoint(any(RentalPointCreateDto.class))).thenReturn(expected);
 
@@ -117,6 +125,7 @@ public class RentalPointControllerTest {
 
         RentalPointCreateDto rentalPointCreateDto = new RentalPointCreateDto();
         rentalPointCreateDto.setLocation("Москва");
+        rentalPointCreateDto.setRentalPointType(RentalPointType.BUILDING);
 
         when(rentalPointService.addNewRentalPoint(any(RentalPointCreateDto.class))).thenReturn(expected);
 
@@ -136,6 +145,7 @@ public class RentalPointControllerTest {
 
         RentalPointCreateDto rentalPointCreateDto = new RentalPointCreateDto();
         rentalPointCreateDto.setLocation("Москва");
+        rentalPointCreateDto.setRentalPointType(RentalPointType.BUILDING);
 
         when(rentalPointService.addNewRentalPoint(any(RentalPointCreateDto.class))).thenThrow(new RentalPointNotFoundException());
 
@@ -604,5 +614,65 @@ public class RentalPointControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.type").value("RentalPointNotFoundException"));
         verify(rentalPointService, times(1)).getRentalPoint(rentalPointId);
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getRentalStationsByParentId_ShouldReturn200AndList_WhenUserRequestsAndAllCorrect() throws Exception {
+        Long rentalPointId = 1L;
+        RentalPointResponseDto dto = new RentalPointResponseDto();
+        dto.setRentalPointId(2L);
+        dto.setLocation("ул. Пушкина, 10");
+
+        when(rentalPointService.getRentalStationsByParentId(rentalPointId)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].rentalPointId").value(2L))
+                .andExpect(jsonPath("$[0].location").value("ул. Пушкина, 10"));
+
+        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getRentalStationsByParentId_ShouldReturn200AndList_WhenAdminRequestsAndAllCorrect() throws Exception {
+        Long rentalPointId = 1L;
+        RentalPointResponseDto dto = new RentalPointResponseDto();
+        dto.setRentalPointId(2L);
+        dto.setLocation("ул. Пушкина, 10");
+
+        when(rentalPointService.getRentalStationsByParentId(rentalPointId)).thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].rentalPointId").value(2L))
+                .andExpect(jsonPath("$[0].location").value("ул. Пушкина, 10"));
+
+        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId);
+    }
+
+    @Test
+    void getRentalStationsByParentId_ShouldReturn401_WhenNonameRequests() throws Exception {
+        Long rentalPointId = 1L;
+
+        mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
+                .andExpect(status().isUnauthorized());
+
+        verify(rentalPointService, never()).getRentalStationsByParentId(anyLong());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void getRentalStationsByParentId_ShouldReturn404_WhenRentalPointNotFound() throws Exception {
+        Long rentalPointId = 1L;
+
+        when(rentalPointService.getRentalStationsByParentId(rentalPointId)).thenThrow(new RentalPointNotFoundException());
+
+        mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.type").value("RentalPointNotFoundException"));
+
+        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId);
     }
 }

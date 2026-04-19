@@ -7,10 +7,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
-import org.scooterrental.model.exception.RentalPointAlreadyExistsException;
+import org.scooterrental.model.enums.RentalPointType;
+import org.scooterrental.model.exception.InvalidHierarchyException;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
-import org.scooterrental.model.exception.SameRentalPointsIDException;
 import org.scooterrental.repository.daointerface.RentalPointDao;
 import org.scooterrental.repository.daointerface.ScooterDao;
 import org.scooterrental.service.dto.RentalPointCreateDto;
@@ -57,61 +57,40 @@ public class RentalPointServiceTest {
 
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation(location);
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
 
         RentalPointCreateDto rentalPointCreateDto = new RentalPointCreateDto();
         rentalPointCreateDto.setLocation(location);
+        rentalPointCreateDto.setRentalPointType(RentalPointType.CITY);
+        rentalPointCreateDto.setParentPointId(null);
 
         RentalPointResponseDto expected = new RentalPointResponseDto();
-        expected.setParentPointId(1L);
         expected.setLocation(location);
 
-        when(rentalPointDao.findRentalPointByLocation(location)).thenReturn(null);
         when(rentalPointMapper.toRentalPointDto(rentalPoint)).thenReturn(expected);
         when(rentalPointMapper.toRentalPointEntity(rentalPointCreateDto, null)).thenReturn(rentalPoint);
 
         RentalPointResponseDto actual = rentalPointService.addNewRentalPoint(rentalPointCreateDto);
         assertEquals(expected.getLocation(), actual.getLocation());
-        assertEquals(expected.getRentalPointId(), actual.getRentalPointId());
 
-        verify(rentalPointDao, times(1)).findRentalPointByLocation(location);
         verify(rentalPointDao, times(1)).create(rentalPoint);
         verify(rentalPointMapper, times(1)).toRentalPointEntity(rentalPointCreateDto, null);
         verify(rentalPointMapper, times(1)).toRentalPointDto(rentalPoint);
     }
 
     @Test
-    void addNewRentalPoint_ShouldThrowRentalPointAlreadyExistsException_WhenRentalPointAlreadyExists() {
-        String location = "Москва";
-
-        RentalPoint rentalPoint = new RentalPoint();
-        rentalPoint.setLocation(location);
-
-        RentalPointCreateDto rentalPointCreateDto = new RentalPointCreateDto();
-        rentalPointCreateDto.setLocation(location);
-
-        when(rentalPointDao.findRentalPointByLocation(location)).thenReturn(rentalPoint);
-
-        assertThrows(RentalPointAlreadyExistsException.class, () -> rentalPointService.addNewRentalPoint(rentalPointCreateDto));
-
-        verify(rentalPointDao, times(1)).findRentalPointByLocation(location);
-        verify(rentalPointMapper, never()).toRentalPointEntity(any(), any());
-        verify(rentalPointMapper, never()).toRentalPointDto(any(RentalPoint.class));
-    }
-
-    @Test
     void addNewRentalPoint_ShouldThrowRentalPointNotFoundException_WhenParentPointNotFound() {
-        String location = "Москва";
+        String location = "ЦАО";
 
         RentalPointCreateDto rentalPointCreateDto = new RentalPointCreateDto();
         rentalPointCreateDto.setLocation(location);
+        rentalPointCreateDto.setRentalPointType(RentalPointType.DISTRICT);
         rentalPointCreateDto.setParentPointId(111L);
 
-        when(rentalPointDao.findRentalPointByLocation(location)).thenReturn(null);
         when(rentalPointDao.findRentalPointById(111L)).thenReturn(null);
 
         assertThrows(RentalPointNotFoundException.class, () -> rentalPointService.addNewRentalPoint(rentalPointCreateDto));
 
-        verify(rentalPointDao, times(1)).findRentalPointByLocation(location);
         verify(rentalPointMapper, never()).toRentalPointEntity(any(), any());
         verify(rentalPointMapper, never()).toRentalPointDto(any(RentalPoint.class));
     }
@@ -130,7 +109,6 @@ public class RentalPointServiceTest {
         expected.setRentalPointId(rentalPointId);
         expected.setLocation(newLocation);
 
-        when(rentalPointDao.findRentalPointByLocation(newLocation)).thenReturn(null);
         when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(rentalPoint);
         when(rentalPointMapper.toRentalPointDto(rentalPoint)).thenReturn(expected);
 
@@ -142,7 +120,6 @@ public class RentalPointServiceTest {
 
         verify(rentalPointDao, times(1)).findRentalPointById(rentalPointId);
         verify(rentalPointDao, times(1)).update(rentalPoint);
-        verify(rentalPointDao, times(1)).findRentalPointByLocation(newLocation);
         verify(rentalPointMapper, times(1)).toRentalPointDto(rentalPoint);
     }
 
@@ -151,32 +128,11 @@ public class RentalPointServiceTest {
         Long rentalPointId = 1L;
         String newLocation = "Химки";
 
-        when(rentalPointDao.findRentalPointByLocation(newLocation)).thenReturn(null);
         when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(null);
 
         assertThrows(RentalPointNotFoundException.class, () -> rentalPointService.setNewRentalPointLocation(rentalPointId, newLocation));
 
         verify(rentalPointDao, times(1)).findRentalPointById(rentalPointId);
-        verify(rentalPointDao, never()).update(any());
-        verify(rentalPointDao, times(1)).findRentalPointByLocation(newLocation);
-        verify(rentalPointMapper, never()).toRentalPointDto(any());
-    }
-
-    @Test
-    void setNewRentalPointLocation_ShouldThrowRentalPointAlreadyExists_WhenThereRentalPointWithSameLocation() {
-        Long rentalPointId = 1L;
-        String newLocation = "Химки";
-
-        RentalPoint rentalPoint = new RentalPoint();
-        rentalPoint.setLocation(newLocation);
-        rentalPoint.setRentalPointId(rentalPointId);
-
-        when(rentalPointDao.findRentalPointByLocation(newLocation)).thenReturn(rentalPoint);
-
-        assertThrows(RentalPointAlreadyExistsException.class, () -> rentalPointService.setNewRentalPointLocation(2L, newLocation));
-
-        verify(rentalPointDao, times(1)).findRentalPointByLocation(newLocation);
-        verify(rentalPointDao, never()).findRentalPointById(rentalPointId);
         verify(rentalPointDao, never()).update(any());
         verify(rentalPointMapper, never()).toRentalPointDto(any());
     }
@@ -190,10 +146,12 @@ public class RentalPointServiceTest {
         RentalPoint parentPoint = new RentalPoint();
         parentPoint.setLocation(location);
         parentPoint.setRentalPointId(newParentPointId);
+        parentPoint.setRentalPointType(RentalPointType.CITY);
 
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation(location);
         rentalPoint.setRentalPointId(rentalPointId);
+        rentalPoint.setRentalPointType(RentalPointType.DISTRICT);
 
         RentalPointResponseDto expected = new RentalPointResponseDto();
         expected.setRentalPointId(rentalPointId);
@@ -209,13 +167,13 @@ public class RentalPointServiceTest {
         assertNotNull(actual);
         assertEquals(expected.getParentPointId(), actual.getParentPointId());
 
-        verify(rentalPointDao, times(2)).findRentalPointById(anyLong());
+        verify(rentalPointDao, times(3)).findRentalPointById(anyLong());
         verify(rentalPointDao, times(1)).update(rentalPoint);
         verify(rentalPointMapper, times(1)).toRentalPointDto(rentalPoint);
     }
 
     @Test
-    void setNewParentPointId_ShouldThrowRentalPointNotFoundException_WhenParentPointNotFound() {
+    void setNewParentPointId_ShouldThrowInvalidHierarchyException_WhenHierarchyIsWrong() {
         Long rentalPointId = 1L;
         Long newParentPointId = 2L;
         String location = "Москва";
@@ -223,10 +181,44 @@ public class RentalPointServiceTest {
         RentalPoint parentPoint = new RentalPoint();
         parentPoint.setLocation(location);
         parentPoint.setRentalPointId(newParentPointId);
+        parentPoint.setRentalPointType(RentalPointType.CITY);
 
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setLocation(location);
         rentalPoint.setRentalPointId(rentalPointId);
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
+
+        when(rentalPointDao.findRentalPointById(newParentPointId)).thenReturn(parentPoint);
+        when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(rentalPoint);
+
+        assertThrows(InvalidHierarchyException.class, () -> rentalPointService.setNewParentPointId(rentalPointId, newParentPointId));
+
+        verify(rentalPointDao, times(2)).findRentalPointById(anyLong());
+        verify(rentalPointDao, never()).update(any());
+        verify(rentalPointMapper, never()).toRentalPointDto(any());
+    }
+
+    @Test
+    void setNewParentPointId_ShouldThrowRentalPointNotFoundException_WhenParentPointNotFound() {
+        Long rentalPointId = 1L;
+        Long newParentPointId = 2L;
+
+        when(rentalPointDao.findRentalPointById(newParentPointId)).thenReturn(null);
+
+        assertThrows(RentalPointNotFoundException.class, () -> rentalPointService.setNewParentPointId(rentalPointId, newParentPointId));
+
+        verify(rentalPointDao, times(1)).findRentalPointById(anyLong());
+        verify(rentalPointDao, never()).update(any());
+        verify(rentalPointMapper, never()).toRentalPointDto(any());
+    }
+
+    @Test
+    void setNewParentPointId_ShouldThrowRentalPointNotFoundException_WhenRentalPointNotFound() {
+        Long rentalPointId = 1L;
+        Long newParentPointId = 2L;
+
+        RentalPoint parentPoint = new RentalPoint();
+        parentPoint.setRentalPointId(newParentPointId);
 
         when(rentalPointDao.findRentalPointById(newParentPointId)).thenReturn(parentPoint);
         when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(null);
@@ -234,45 +226,8 @@ public class RentalPointServiceTest {
         assertThrows(RentalPointNotFoundException.class, () -> rentalPointService.setNewParentPointId(rentalPointId, newParentPointId));
 
         verify(rentalPointDao, times(2)).findRentalPointById(anyLong());
-        verify(rentalPointDao, never()).update(rentalPoint);
-        verify(rentalPointMapper, never()).toRentalPointDto(rentalPoint);
-    }
-
-    @Test
-    void setNewParentPointId_ShouldThrowSameRentalPointsIDException_WhenGotSameRentalPoints() {
-        Long rentalPointId = 1L;
-        String location = "Москва";
-
-        RentalPoint rentalPoint = new RentalPoint();
-        rentalPoint.setLocation(location);
-        rentalPoint.setRentalPointId(rentalPointId);
-
-        when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(rentalPoint);
-
-        assertThrows(SameRentalPointsIDException.class, () -> rentalPointService.setNewParentPointId(rentalPointId, rentalPointId));
-
-        verify(rentalPointDao, times(2)).findRentalPointById(anyLong());
-        verify(rentalPointDao, never()).update(rentalPoint);
-        verify(rentalPointMapper, never()).toRentalPointDto(rentalPoint);
-    }
-
-    @Test
-    void setNewParentPointId_ShouldThrowRentalPointNotFoundException_WhenRentalPointNotFound() {
-        Long rentalPointId = 1L;
-        Long newParentPointId = 2L;
-        String location = "Москва";
-
-        RentalPoint rentalPoint = new RentalPoint();
-        rentalPoint.setLocation(location);
-        rentalPoint.setRentalPointId(rentalPointId);
-
-        when(rentalPointDao.findRentalPointById(newParentPointId)).thenReturn(null);
-
-        assertThrows(RentalPointNotFoundException.class, () -> rentalPointService.setNewParentPointId(rentalPointId, newParentPointId));
-
-        verify(rentalPointDao, times(1)).findRentalPointById(anyLong());
-        verify(rentalPointDao, never()).update(rentalPoint);
-        verify(rentalPointMapper, never()).toRentalPointDto(rentalPoint);
+        verify(rentalPointDao, never()).update(any());
+        verify(rentalPointMapper, never()).toRentalPointDto(any());
     }
 
     @Test
@@ -416,14 +371,17 @@ public class RentalPointServiceTest {
         RentalPoint rentalPoint = new RentalPoint();
         rentalPoint.setRentalPointId(rentalPointId);
         rentalPoint.setLocation("Москва");
+        rentalPoint.setRentalPointType(RentalPointType.CITY);
+        rentalPoint.setChildPoints(new ArrayList<>());
 
         RentalPointDetailsDto expected = new RentalPointDetailsDto();
         expected.setRentalPointId(rentalPointId);
         expected.setLocation("Москва");
+        expected.setRentalPointType(RentalPointType.CITY.name());
+        expected.setChildPoints(new ArrayList<>());
 
         Scooter scooter = new Scooter();
         ScooterResponseDto scooterResponseDto = new ScooterResponseDto();
-
 
         when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(rentalPoint);
         when(scooterDao.findScootersByRentalPoint(rentalPointId)).thenReturn(new ArrayList<>(List.of(scooter)));
@@ -433,6 +391,7 @@ public class RentalPointServiceTest {
 
         assertNotNull(actual);
         assertEquals(expected.getRentalPointId(), actual.getRentalPointId());
+        assertEquals(expected.getRentalPointType(), actual.getRentalPointType());
 
         verify(rentalPointDao, times(1)).findRentalPointById(rentalPointId);
     }
@@ -446,5 +405,151 @@ public class RentalPointServiceTest {
         assertThrows(RentalPointNotFoundException.class, () -> rentalPointService.getRentalPointDetails(rentalPointId));
 
         verify(rentalPointDao, times(1)).findRentalPointById(rentalPointId);
+    }
+
+    @Test
+    void getBuildingsByRentalPointId_ShouldReturnListOfDto_WhenStartPointIsBuilding() {
+        Long rentalPointId = 1L;
+
+        RentalPoint parentStreet = new RentalPoint();
+        parentStreet.setLocation("ул. Ленина");
+
+        RentalPoint building = new RentalPoint();
+        building.setRentalPointId(rentalPointId);
+        building.setRentalPointType(RentalPointType.BUILDING);
+        building.setLocation("5");
+        building.setParentPoint(parentStreet);
+
+        RentalPointResponseDto mappedDto = new RentalPointResponseDto();
+        mappedDto.setRentalPointId(rentalPointId);
+        mappedDto.setLocation("5");
+
+        when(rentalPointDao.findRentalPointById(rentalPointId)).thenReturn(building);
+        when(rentalPointMapper.toRentalPointDto(building)).thenReturn(mappedDto);
+
+        List<RentalPointResponseDto> actual = rentalPointService.getRentalStationsByParentId(rentalPointId);
+
+        assertNotNull(actual);
+        assertEquals(1, actual.size());
+        assertEquals("ул. Ленина, 5", actual.get(0).getLocation());
+
+        verify(rentalPointDao, times(1)).findRentalPointById(rentalPointId);
+        verify(rentalPointMapper, times(1)).toRentalPointDto(building);
+    }
+
+    @Test
+    void getBuildingsByRentalPointId_ShouldReturnListOfDto_WhenStartPointHasComplexHierarchy() {
+        Long startPointId = 1L;
+
+        RentalPoint district = new RentalPoint();
+        district.setRentalPointId(startPointId);
+        district.setRentalPointType(RentalPointType.DISTRICT);
+        district.setLocation("Центральный");
+        district.setChildPoints(new ArrayList<>());
+
+        RentalPoint street = new RentalPoint();
+        street.setRentalPointType(RentalPointType.STREET);
+        street.setLocation("ул. Пушкина");
+        street.setParentPoint(district);
+        street.setChildPoints(new ArrayList<>());
+
+        RentalPoint building = new RentalPoint();
+        building.setRentalPointId(2L);
+        building.setRentalPointType(RentalPointType.BUILDING);
+        building.setLocation("10");
+        building.setParentPoint(street);
+
+        street.getChildPoints().add(building);
+        district.getChildPoints().add(street);
+
+        RentalPointResponseDto mappedDto = new RentalPointResponseDto();
+        mappedDto.setRentalPointId(2L);
+        mappedDto.setLocation("10");
+
+        when(rentalPointDao.findRentalPointById(startPointId)).thenReturn(district);
+        when(rentalPointMapper.toRentalPointDto(building)).thenReturn(mappedDto);
+
+        List<RentalPointResponseDto> actual = rentalPointService.getRentalStationsByParentId(startPointId);
+
+        assertNotNull(actual);
+        assertEquals(1, actual.size());
+        assertEquals("ул. Пушкина, 10", actual.get(0).getLocation());
+
+        verify(rentalPointDao, times(1)).findRentalPointById(startPointId);
+        verify(rentalPointMapper, times(1)).toRentalPointDto(building);
+    }
+
+    @Test
+    void getBuildingsByRentalPointId_ShouldReturnDtoWithoutDeletedPoints_WhenThereDeletedPoints() {
+        Long startPointId = 1L;
+
+        RentalPoint street = new RentalPoint();
+        street.setRentalPointId(startPointId);
+        street.setRentalPointType(RentalPointType.STREET);
+        street.setLocation("ул. Чехова");
+        street.setChildPoints(new ArrayList<>());
+
+        RentalPoint activeBuilding = new RentalPoint();
+        activeBuilding.setRentalPointType(RentalPointType.BUILDING);
+        activeBuilding.setLocation("1");
+        activeBuilding.setParentPoint(street);
+
+        RentalPoint deletedBuilding = new RentalPoint();
+        deletedBuilding.setRentalPointType(RentalPointType.BUILDING);
+        deletedBuilding.setLocation("2");
+        deletedBuilding.setParentPoint(street);
+        deletedBuilding.setDeleted(true);
+
+        street.getChildPoints().add(activeBuilding);
+        street.getChildPoints().add(deletedBuilding);
+
+        RentalPointResponseDto mappedDto = new RentalPointResponseDto();
+        mappedDto.setLocation("1");
+
+        when(rentalPointDao.findRentalPointById(startPointId)).thenReturn(street);
+        when(rentalPointMapper.toRentalPointDto(activeBuilding)).thenReturn(mappedDto);
+
+        List<RentalPointResponseDto> actual = rentalPointService.getRentalStationsByParentId(startPointId);
+
+        assertNotNull(actual);
+        assertEquals(1, actual.size());
+        assertEquals("ул. Чехова, 1", actual.get(0).getLocation());
+
+        verify(rentalPointDao, times(1)).findRentalPointById(startPointId);
+        verify(rentalPointMapper, times(1)).toRentalPointDto(activeBuilding);
+        verify(rentalPointMapper, never()).toRentalPointDto(deletedBuilding);
+    }
+
+    @Test
+    void getBuildingsByRentalPointId_ShouldReturnEmptyList_WhenNoBuildingsFound() {
+        Long startPointId = 1L;
+
+        RentalPoint street = new RentalPoint();
+        street.setRentalPointId(startPointId);
+        street.setRentalPointType(RentalPointType.STREET);
+        street.setLocation("ул. Ленина");
+        street.setChildPoints(new ArrayList<>());
+
+        when(rentalPointDao.findRentalPointById(startPointId)).thenReturn(street);
+
+        List<RentalPointResponseDto> actual = rentalPointService.getRentalStationsByParentId(startPointId);
+
+        assertNotNull(actual);
+        assertEquals(0, actual.size());
+
+        verify(rentalPointDao, times(1)).findRentalPointById(startPointId);
+        verify(rentalPointMapper, never()).toRentalPointDto(any());
+    }
+
+    @Test
+    void getBuildingsByRentalPointId_ShouldThrowRentalPointNotFoundException_WhenStartPointNotFound() {
+        Long startPointId = 1L;
+
+        when(rentalPointDao.findRentalPointById(startPointId)).thenReturn(null);
+
+        assertThrows(RentalPointNotFoundException.class, () -> rentalPointService.getRentalStationsByParentId(startPointId));
+
+        verify(rentalPointDao, times(1)).findRentalPointById(startPointId);
+        verify(rentalPointMapper, never()).toRentalPointDto(any());
     }
 }

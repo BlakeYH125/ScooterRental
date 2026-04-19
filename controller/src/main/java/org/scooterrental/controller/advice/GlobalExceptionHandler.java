@@ -1,5 +1,6 @@
 package org.scooterrental.controller.advice;
 
+import org.scooterrental.model.exception.InvalidHierarchyException;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
 import org.scooterrental.model.exception.RentalPointAlreadyExistsException;
@@ -131,7 +132,8 @@ public class GlobalExceptionHandler {
             PasswordMismatchException.class,
             MethodArgumentTypeMismatchException.class,
             LowBatteryLevelException.class,
-            UserNotBannedException.class})
+            UserNotBannedException.class,
+            InvalidHierarchyException.class})
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(RuntimeException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
     }

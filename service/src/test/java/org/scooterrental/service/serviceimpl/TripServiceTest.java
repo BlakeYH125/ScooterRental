@@ -12,6 +12,7 @@ import org.scooterrental.model.entity.Trip;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.PaymentType;
+import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.enums.TripStatus;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
@@ -421,6 +422,7 @@ public class TripServiceTest {
 
         RentalPoint endRentalPoint = new RentalPoint();
         endRentalPoint.setRentalPointId(endRentalPointId);
+        endRentalPoint.setRentalPointType(RentalPointType.BUILDING);
 
         Tariff tariff = new Tariff();
         tariff.setTariffId(tariffId);
