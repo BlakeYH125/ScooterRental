@@ -11,6 +11,7 @@ import org.scooterrental.repository.daointerface.UserDao;
 import org.scooterrental.service.dto.AuthenticationResponseDto;
 import org.scooterrental.service.dto.LoginRequest;
 import org.scooterrental.service.dto.UserCreateDto;
+import org.scooterrental.service.mapper.UserMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,9 @@ public class AuthenticationServiceTest {
     @Mock
     private AuthenticationManager authenticationManager;
 
+    @Mock
+    private UserMapper userMapper;
+
     @InjectMocks
     private AuthenticationServiceImpl authenticationService;
 
@@ -55,9 +59,13 @@ public class AuthenticationServiceTest {
         userCreateDto.setPassword(password);
         userCreateDto.setAge(24);
 
+        User user = new User();
+        user.setPassword(password);
+
         when(userDao.findUserByUsername(username)).thenReturn(null);
         when(jwtService.generateToken(username)).thenReturn("qwerty");
         when(passwordEncoder.encode(password)).thenReturn("asdfghjk");
+        when(userMapper.toUserEntity(any())).thenReturn(user);
 
         AuthenticationResponseDto actual = authenticationService.register(userCreateDto);
 

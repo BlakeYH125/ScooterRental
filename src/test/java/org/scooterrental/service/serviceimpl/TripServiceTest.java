@@ -122,6 +122,7 @@ public class TripServiceTest {
         when(tariffDao.findTariff(tariffId)).thenReturn(tariff);
         when(tripMapper.toTripDto(any(Trip.class))).thenReturn(expected);
         when(tripDao.isThereActiveTripByUserId(userId)).thenReturn(false);
+        when(tripMapper.toTripEntity(any(), any(), any(), any())).thenReturn(trip);
 
         TripResponseDto actual = tripService.startTrip(tripCreateDto);
 
