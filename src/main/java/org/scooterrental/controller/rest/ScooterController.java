@@ -1,6 +1,7 @@
 package org.scooterrental.controller.rest;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.service.dto.ScooterCreateDto;
 import org.scooterrental.service.dto.ScooterResponseDto;
@@ -22,14 +23,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/scooter-rental/scooters")
 public class ScooterController {
     private final ScooterService scooterService;
     private static final Logger logger = LoggerFactory.getLogger(ScooterController.class);
-
-    public ScooterController(ScooterService scooterService) {
-        this.scooterService = scooterService;
-    }
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

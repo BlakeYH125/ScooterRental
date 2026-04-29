@@ -10,12 +10,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.scooterrental.model.enums.TripStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "trips")
 public class Trip {
 
@@ -59,103 +67,4 @@ public class Trip {
     @ManyToOne
     @JoinColumn(name = "tariff_id", nullable = false)
     private Tariff tariff;
-
-    public Trip() {
-    }
-
-    public Trip(User user, Scooter scooter, RentalPoint startPoint, LocalDateTime startTime, Tariff tariff) {
-        this.user = user;
-        this.scooter = scooter;
-        this.startPoint = startPoint;
-        this.startTime = startTime;
-        this.tariff = tariff;
-    }
-
-    public Long getTripId() {
-        return tripId;
-    }
-
-    public void setTripId(Long tripId) {
-        this.tripId = tripId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Scooter getScooter() {
-        return scooter;
-    }
-
-    public void setScooter(Scooter scooter) {
-        this.scooter = scooter;
-    }
-
-    public TripStatus getTripStatus() {
-        return tripStatus;
-    }
-
-    public void setTripStatus(TripStatus tripStatus) {
-        this.tripStatus = tripStatus;
-    }
-
-    public RentalPoint getStartPoint() {
-        return startPoint;
-    }
-
-    public void setStartPoint(RentalPoint startPoint) {
-        this.startPoint = startPoint;
-    }
-
-    public RentalPoint getEndPoint() {
-        return endPoint;
-    }
-
-    public void setEndPoint(RentalPoint endPoint) {
-        this.endPoint = endPoint;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
-
-    public BigDecimal getTotalCost() {
-        return totalCost;
-    }
-
-    public void setTotalCost(BigDecimal totalCost) {
-        this.totalCost = totalCost;
-    }
-
-    public Tariff getTariff() {
-        return tariff;
-    }
-
-    public void setTariff(Tariff tariff) {
-        this.tariff = tariff;
-    }
-
-    public double getMileage() {
-        return mileage;
-    }
-
-    public void setMileage(double mileage) {
-        this.mileage = mileage;
-    }
 }

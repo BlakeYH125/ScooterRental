@@ -11,12 +11,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.scooterrental.model.enums.RentalPointType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "rental_points")
 public class RentalPoint {
 
@@ -41,61 +49,4 @@ public class RentalPoint {
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
-
-    public RentalPoint() {
-    }
-
-    public RentalPoint(RentalPointType rentalPointType, String location, RentalPoint parentPoint) {
-        this.rentalPointType = rentalPointType;
-        this.location = location;
-        this.parentPoint = parentPoint;
-    }
-
-    public Long getRentalPointId() {
-        return rentalPointId;
-    }
-
-    public void setRentalPointId(Long rentalPointId) {
-        this.rentalPointId = rentalPointId;
-    }
-
-    public RentalPointType getRentalPointType() {
-        return rentalPointType;
-    }
-
-    public void setRentalPointType(RentalPointType rentalPointType) {
-        this.rentalPointType = rentalPointType;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public RentalPoint getParentPoint() {
-        return parentPoint;
-    }
-
-    public void setParentPoint(RentalPoint parentPoint) {
-        this.parentPoint = parentPoint;
-    }
-
-    public List<RentalPoint> getChildPoints() {
-        return childPoints;
-    }
-
-    public void setChildPoints(List<RentalPoint> childPoints) {
-        this.childPoints = childPoints;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
 }

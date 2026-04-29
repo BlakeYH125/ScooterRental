@@ -1,5 +1,6 @@
 package org.scooterrental.service.serviceimpl;
 
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.entity.Tariff;
 import org.scooterrental.model.enums.PaymentType;
 import org.scooterrental.model.exception.TariffNotFoundException;
@@ -18,16 +19,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class TariffServiceImpl implements TariffService {
     private final TariffDao tariffDao;
     private final TariffMapper tariffMapper;
     private static final Logger logger = LoggerFactory.getLogger(TariffServiceImpl.class);
-
-    public TariffServiceImpl(TariffDao tariffDao, TariffMapper tariffMapper) {
-        this.tariffDao = tariffDao;
-        this.tariffMapper = tariffMapper;
-    }
 
     @Override
     public TariffResponseDto addNewTariff(TariffCreateDto tariffCreateDto) {

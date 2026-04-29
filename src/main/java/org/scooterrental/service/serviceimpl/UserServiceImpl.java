@@ -1,5 +1,6 @@
 package org.scooterrental.service.serviceimpl;
 
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
@@ -26,18 +27,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class UserServiceImpl implements UserService {
     private final UserDao userDao;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
-
-    public UserServiceImpl(UserDao userDao, UserMapper userMapper, PasswordEncoder passwordEncoder) {
-        this.userDao = userDao;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public UserResponseDto changeUserData(Long userId, UserUpdateDto userUpdateDto) {

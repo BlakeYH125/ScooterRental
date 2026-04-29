@@ -1,6 +1,7 @@
 package org.scooterrental.controller.rest;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.service.dto.ChangePasswordDto;
 import org.scooterrental.service.dto.UserResponseDto;
@@ -22,14 +23,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/scooter-rental/users")
 public class UserController {
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PatchMapping("/{userId}/change-user-data")
     @PreAuthorize("hasAnyAuthority('ROLE_USER', 'ROLE_ADMIN') and authentication.principal.userId == #userId")

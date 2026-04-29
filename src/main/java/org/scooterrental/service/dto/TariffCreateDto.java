@@ -3,9 +3,11 @@ package org.scooterrental.service.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
+@Data
 public class TariffCreateDto {
 
     @NotBlank(message = "Способ оплаты обязателен")
@@ -17,31 +19,4 @@ public class TariffCreateDto {
 
     @PositiveOrZero(message = "Скидка не может быть отрицательной")
     private int discount;
-
-    public TariffCreateDto() {
-    }
-
-    public String getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(String paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public int getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(int discount) {
-        this.discount = discount;
-    }
 }

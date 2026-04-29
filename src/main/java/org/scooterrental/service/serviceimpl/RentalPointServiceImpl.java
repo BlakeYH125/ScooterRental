@@ -1,5 +1,6 @@
 package org.scooterrental.service.serviceimpl;
 
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.exception.InvalidHierarchyException;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class RentalPointServiceImpl implements RentalPointService {
     private final RentalPointDao rentalPointDao;
@@ -31,13 +33,6 @@ public class RentalPointServiceImpl implements RentalPointService {
     private final RentalPointMapper rentalPointMapper;
     private final ScooterMapper scooterMapper;
     private static final Logger logger = LoggerFactory.getLogger(RentalPointServiceImpl.class);
-
-    public RentalPointServiceImpl(RentalPointDao rentalPointDao, RentalPointMapper rentalPointMapper, ScooterDao scooterDao, ScooterMapper scooterMapper) {
-        this.rentalPointDao = rentalPointDao;
-        this.rentalPointMapper = rentalPointMapper;
-        this.scooterDao = scooterDao;
-        this.scooterMapper = scooterMapper;
-    }
 
     @Override
     public RentalPointResponseDto addNewRentalPoint(RentalPointCreateDto rentalPointCreateDto) {

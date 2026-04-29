@@ -8,6 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +24,10 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class User implements UserDetails {
 
@@ -56,98 +64,6 @@ public class User implements UserDetails {
 
     @Column(name = "season_ticket_end_date")
     private LocalDateTime seasonTicketEndDate = null;
-
-    public User() {
-    }
-
-    public User(String username, String password, String firstName, String lastName, int age, Role role) {
-        this.username = username;
-        this.password = password;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.age = age;
-        this.role = role;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public BanReason getBanReason() {
-        return banReason;
-    }
-
-    public void setBanReason(BanReason banReason) {
-        this.banReason = banReason;
-    }
-
-    public LocalDateTime getSeasonTicketEndDate() {
-        return seasonTicketEndDate;
-    }
-
-    public void setSeasonTicketEndDate(LocalDateTime seasonTicketEndDate) {
-        this.seasonTicketEndDate = seasonTicketEndDate;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

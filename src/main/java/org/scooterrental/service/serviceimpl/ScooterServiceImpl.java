@@ -1,5 +1,6 @@
 package org.scooterrental.service.serviceimpl;
 
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.model.enums.RentalPointType;
@@ -24,18 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class ScooterServiceImpl implements ScooterService {
     private final ScooterDao scooterDao;
     private final RentalPointDao rentalPointDao;
     private final ScooterMapper scooterMapper;
     private static final Logger logger = LoggerFactory.getLogger(ScooterServiceImpl.class);
-
-    public ScooterServiceImpl(ScooterDao scooterDao, RentalPointDao rentalPointDao, ScooterMapper scooterMapper) {
-        this.scooterDao = scooterDao;
-        this.rentalPointDao = rentalPointDao;
-        this.scooterMapper = scooterMapper;
-    }
 
     @Override
     public ScooterResponseDto addNewScooter(ScooterCreateDto scooterCreateDto) {

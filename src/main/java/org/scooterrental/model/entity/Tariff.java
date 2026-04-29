@@ -8,11 +8,19 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.scooterrental.model.enums.PaymentType;
 
 import java.math.BigDecimal;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "tariffs")
 public class Tariff {
 
@@ -30,45 +38,4 @@ public class Tariff {
 
     @Column(name = "discount", nullable = false)
     private int discount = 0;
-
-    public Tariff() {
-    }
-
-    public Tariff(PaymentType paymentType, BigDecimal price, int discount) {
-        this.paymentType = paymentType;
-        this.price = price;
-        this.discount = discount;
-    }
-
-    public Long getTariffId() {
-        return tariffId;
-    }
-
-    public void setTariffId(Long tariffId) {
-        this.tariffId = tariffId;
-    }
-
-    public PaymentType getPaymentType() {
-        return paymentType;
-    }
-
-    public void setPaymentType(PaymentType paymentType) {
-        this.paymentType = paymentType;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public int getDiscount() {
-        return discount;
-    }
-
-    public void setDiscount(int discount) {
-        this.discount = discount;
-    }
 }

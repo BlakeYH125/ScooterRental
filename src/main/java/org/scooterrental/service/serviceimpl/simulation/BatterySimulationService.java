@@ -1,5 +1,6 @@
 package org.scooterrental.service.serviceimpl.simulation;
 
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.model.entity.Trip;
 import org.scooterrental.repository.daointerface.ScooterDao;
@@ -14,17 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BatterySimulationService {
     private final TripDao tripDao;
     private final ScooterDao scooterDao;
     private final TripService tripService;
     private static final Logger logger = LoggerFactory.getLogger(BatterySimulationService.class);
-
-    public BatterySimulationService(TripDao tripDao, ScooterDao scooterDao, TripService tripService) {
-        this.tripDao = tripDao;
-        this.scooterDao = scooterDao;
-        this.tripService = tripService;
-    }
 
     @Scheduled(fixedRate = 15000)
     @Transactional

@@ -1,6 +1,7 @@
 package org.scooterrental.controller.rest;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.enums.PaymentType;
 import org.scooterrental.service.dto.TariffCreateDto;
 import org.scooterrental.service.dto.TariffResponseDto;
@@ -22,14 +23,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/scooter-rental/tariffs")
 public class TariffController {
     private final TariffService tariffService;
     private static final Logger logger = LoggerFactory.getLogger(TariffController.class);
-
-    public TariffController(TariffService tariffService) {
-        this.tariffService = tariffService;
-    }
 
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

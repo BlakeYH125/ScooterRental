@@ -1,6 +1,7 @@
 package org.scooterrental.controller.rest;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.service.dto.AuthenticationResponseDto;
 import org.scooterrental.service.dto.LoginRequest;
 import org.scooterrental.service.dto.UserCreateDto;
@@ -14,14 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("scooter-rental/auth")
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-
-    public AuthenticationController(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponseDto> register(@Valid @RequestBody UserCreateDto userCreateDto) {

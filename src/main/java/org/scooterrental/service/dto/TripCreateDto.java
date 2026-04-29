@@ -2,7 +2,9 @@ package org.scooterrental.service.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Data;
 
+@Data
 public class TripCreateDto {
 
     @NotNull(message = "ID пользователя обязателен")
@@ -16,31 +18,4 @@ public class TripCreateDto {
     @NotNull(message = "ID тарифа обязателен")
     @Positive(message = "ID тарифа должен быть больше нуля")
     private Long tariffId;
-
-    public TripCreateDto() {
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public Long getScooterId() {
-        return scooterId;
-    }
-
-    public void setScooterId(Long scooterId) {
-        this.scooterId = scooterId;
-    }
-
-    public Long getTariffId() {
-        return tariffId;
-    }
-
-    public void setTariffId(Long tariffId) {
-        this.tariffId = tariffId;
-    }
 }

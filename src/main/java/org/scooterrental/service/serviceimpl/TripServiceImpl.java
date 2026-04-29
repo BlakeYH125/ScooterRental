@@ -1,5 +1,6 @@
 package org.scooterrental.service.serviceimpl;
 
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.entity.Trip;
 import org.scooterrental.model.entity.Tariff;
 import org.scooterrental.model.entity.Scooter;
@@ -45,6 +46,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class TripServiceImpl implements TripService {
     private final TripDao tripDao;
@@ -55,16 +57,6 @@ public class TripServiceImpl implements TripService {
     private final TripMapper tripMapper;
     private final UserService userService;
     private static final Logger logger = LoggerFactory.getLogger(TripServiceImpl.class);
-
-    public TripServiceImpl(TripDao tripDao, UserDao userDao, ScooterDao scooterDao, TariffDao tariffDao, RentalPointDao rentalPointDao, TripMapper tripMapper, UserService userService) {
-        this.tripDao = tripDao;
-        this.userDao = userDao;
-        this.scooterDao = scooterDao;
-        this.tariffDao = tariffDao;
-        this.rentalPointDao = rentalPointDao;
-        this.tripMapper = tripMapper;
-        this.userService = userService;
-    }
 
     @Override
     public TripResponseDto startTrip(TripCreateDto tripCreateDto) {
@@ -102,7 +94,9 @@ public class TripServiceImpl implements TripService {
             throw new UserAlreadyHasActiveTripException();
         }
         scooter.setScooterStatus(ScooterStatus.IN_RENT);
-        Trip trip = new Trip(user, scooter, scooter.getRentalPoint(), LocalDateTime.now(), tariff);
+        Trip trip = tripMapper.toTripEntity(tripCreateDto, user, scooter, tariff);
+        trip.setStartTime(LocalDateTime.now());
+        trip.setStartPoint(scooter.getRentalPoint());
         scooter.setRentalPoint(null);
         tripDao.create(trip);
         scooterDao.update(scooter);

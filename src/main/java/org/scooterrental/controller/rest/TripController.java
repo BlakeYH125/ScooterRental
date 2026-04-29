@@ -1,6 +1,7 @@
 package org.scooterrental.controller.rest;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.service.dto.TripCreateDto;
 import org.scooterrental.service.dto.TripResponseDto;
@@ -22,14 +23,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/scooter-rental/trips")
 public class TripController {
     private final TripService tripService;
     private static final Logger logger = LoggerFactory.getLogger(TripController.class);
-
-    public TripController(TripService tripService) {
-        this.tripService = tripService;
-    }
 
     @PreAuthorize("hasAuthority('ROLE_USER') and authentication.principal.userId == #tripCreateDto.userId")
     @PostMapping("/start")

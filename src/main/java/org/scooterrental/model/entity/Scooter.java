@@ -10,9 +10,17 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.scooterrental.model.enums.ScooterStatus;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "scooters")
 public class Scooter {
 
@@ -40,67 +48,4 @@ public class Scooter {
 
     @Column(name = "mileage", nullable = false)
     private double mileage = 0.0;
-
-    public Scooter() {
-    }
-
-    public Scooter(String model) {
-        this.model = model;
-    }
-
-    public Long getScooterId() {
-        return scooterId;
-    }
-
-    public void setScooterId(Long scooterId) {
-        this.scooterId = scooterId;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public int getBatteryLevel() {
-        return batteryLevel;
-    }
-
-    public void setBatteryLevel(int batteryLevel) {
-        this.batteryLevel = batteryLevel;
-    }
-
-    public ScooterStatus getScooterStatus() {
-        return scooterStatus;
-    }
-
-    public void setScooterStatus(ScooterStatus scooterStatus) {
-        this.scooterStatus = scooterStatus;
-    }
-
-    public RentalPoint getRentalPoint() {
-        return rentalPoint;
-    }
-
-    public void setRentalPoint(RentalPoint rentalPoint) {
-        this.rentalPoint = rentalPoint;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-    public double getMileage() {
-        return mileage;
-    }
-
-    public void setMileage(double mileage) {
-        this.mileage = mileage;
-    }
 }
