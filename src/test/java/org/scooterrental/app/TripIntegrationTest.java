@@ -81,8 +81,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         scooterDao.create(scooter);
 
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
 
@@ -170,8 +170,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         scooterDao.create(scooter);
 
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
 
@@ -241,8 +241,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         scooterDao.create(scooter);
 
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
 
@@ -294,8 +294,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         scooterDao.create(scooter);
 
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
 
@@ -345,8 +345,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         scooterDao.create(scooter);
 
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
 
@@ -390,8 +390,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         scooterDao.create(scooter);
 
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
 
@@ -435,8 +435,8 @@ public class TripIntegrationTest extends IntegrationTestBase {
         scooterDao.create(scooter);
 
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
 

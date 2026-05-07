@@ -124,17 +124,13 @@ public class TripServiceImpl implements TripService {
         Tariff tariff = trip.getTariff();
         Scooter scooter = trip.getScooter();
         LocalDateTime endTime = LocalDateTime.now();
-        long tripTimeMinutes = Duration.between(trip.getStartTime(), endTime).toMinutes();
-        long tripTimeHours = (long) Math.ceil((tripTimeMinutes) / 60.0);
-        if (tripTimeHours == 0) {
-            tripTimeHours = 1;
-        }
+        long tripTimeMinutes = (long) Math.ceil(Duration.between(trip.getStartTime(), endTime).toSeconds() / 60.0);
         if (tripTimeMinutes == 0) {
             tripTimeMinutes = 1;
         }
         BigDecimal totalCost = BigDecimal.ZERO;
-        if (tariff.getPaymentType() == PaymentType.HOURLY) {
-            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeHours)).multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
+        if (tariff.getPaymentType() == PaymentType.PER_MINUTE) {
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeMinutes)).multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndPoint(endRentalPoint);
@@ -161,17 +157,13 @@ public class TripServiceImpl implements TripService {
         Tariff tariff = trip.getTariff();
         Scooter scooter = trip.getScooter();
         LocalDateTime endTime = LocalDateTime.now();
-        long tripTimeMinutes = Duration.between(trip.getStartTime(), endTime).toMinutes();
-        long tripTimeHours = (long) Math.ceil((tripTimeMinutes) / 60.0);
-        if (tripTimeHours == 0) {
-            tripTimeHours = 1;
-        }
+        long tripTimeMinutes = (long) Math.ceil(Duration.between(trip.getStartTime(), endTime).toSeconds() / 60.0);
         if (tripTimeMinutes == 0) {
             tripTimeMinutes = 1;
         }
         BigDecimal totalCost = BigDecimal.ZERO;
-        if (tariff.getPaymentType() == PaymentType.HOURLY) {
-            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeHours)).multiply(BigDecimal.valueOf(((100 - tariff.getDiscount()) / 100.0)));
+        if (tariff.getPaymentType() == PaymentType.PER_MINUTE) {
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeMinutes)).multiply(BigDecimal.valueOf(((100 - tariff.getDiscount()) / 100.0)));
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndTime(endTime);

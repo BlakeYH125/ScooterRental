@@ -33,6 +33,9 @@ public class AppConfig {
     @Value("${database.password}")
     private String password;
 
+    @Value("${app.flyway.locations}")
+    private String[] flywayLocations;
+
     public AppConfig() {
     }
 
@@ -75,7 +78,7 @@ public class AppConfig {
     public Flyway flyway() {
         return Flyway.configure()
                 .dataSource(url, username, password)
-                .locations("classpath:db/migration")
+                .locations(flywayLocations)
                 .baselineOnMigrate(true)
                 .load();
     }

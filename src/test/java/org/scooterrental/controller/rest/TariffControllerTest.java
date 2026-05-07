@@ -112,7 +112,7 @@ public class TariffControllerTest {
     @WithMockUser(roles = "ADMIN")
     void setNewPaymentType_ShouldReturn200AndDto_WhenAdminRequestsAndAllCorrect() throws Exception {
         Long tariffId = 1L;
-        PaymentType newPaymentType = PaymentType.HOURLY;
+        PaymentType newPaymentType = PaymentType.PER_MINUTE;
 
         TariffResponseDto expected = new TariffResponseDto();
         expected.setTariffId(tariffId);
@@ -134,7 +134,7 @@ public class TariffControllerTest {
     @WithMockUser(roles = "USER")
     void setNewPaymentType_ShouldReturn403_WhenUserRequests() throws Exception {
         Long tariffId = 1L;
-        PaymentType newPaymentType = PaymentType.HOURLY;
+        PaymentType newPaymentType = PaymentType.PER_MINUTE;
 
         mockMvc.perform(patch("/scooter-rental/tariffs/{tariffId}/set-new-payment-type", tariffId)
                         .param("newPaymentType", newPaymentType.toString())
@@ -148,7 +148,7 @@ public class TariffControllerTest {
     @Test
     void setNewPaymentType_ShouldReturn401_WhenNonameRequests() throws Exception {
         Long tariffId = 1L;
-        PaymentType newPaymentType = PaymentType.HOURLY;
+        PaymentType newPaymentType = PaymentType.PER_MINUTE;
 
         mockMvc.perform(patch("/scooter-rental/tariffs/{tariffId}/set-new-payment-type", tariffId)
                         .param("newPaymentType", newPaymentType.toString())
@@ -162,7 +162,7 @@ public class TariffControllerTest {
     @WithMockUser(roles = "ADMIN")
     void setNewPaymentType_ShouldReturn404_WhenTariffNotFound() throws Exception {
         Long tariffId = 1L;
-        PaymentType newPaymentType = PaymentType.HOURLY;
+        PaymentType newPaymentType = PaymentType.PER_MINUTE;
 
         when(tariffService.setNewPaymentType(tariffId, newPaymentType)).thenThrow(new TariffNotFoundException());
 
@@ -206,7 +206,7 @@ public class TariffControllerTest {
     @WithMockUser(roles = "ADMIN")
     void setNewPrice_ShouldReturn200AndDto_WhenAdminRequestsAndAllCorrect() throws Exception {
         Long tariffId = 1L;
-        BigDecimal newPrice = BigDecimal.valueOf(150.0);
+        BigDecimal newPrice = BigDecimal.valueOf(15.0);
 
         TariffResponseDto expected = new TariffResponseDto();
         expected.setTariffId(tariffId);
@@ -219,7 +219,7 @@ public class TariffControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tariffId").value(tariffId))
-                .andExpect(jsonPath("$.price").value(150.0));
+                .andExpect(jsonPath("$.price").value(15.0));
 
         verify(tariffService, times(1)).setNewPrice(tariffId, newPrice);
     }
@@ -228,7 +228,7 @@ public class TariffControllerTest {
     @WithMockUser(roles = "USER")
     void setNewPrice_ShouldReturn403_WhenUserRequests() throws Exception {
         Long tariffId = 1L;
-        BigDecimal newPrice = BigDecimal.valueOf(150.0);
+        BigDecimal newPrice = BigDecimal.valueOf(15.0);
 
         mockMvc.perform(patch("/scooter-rental/tariffs/{tariffId}/set-new-price", tariffId)
                         .param("newPrice", newPrice.toString())
@@ -242,7 +242,7 @@ public class TariffControllerTest {
     @Test
     void setNewPrice_ShouldReturn401_WhenNonameRequests() throws Exception {
         Long tariffId = 1L;
-        BigDecimal newPrice = BigDecimal.valueOf(150.0);
+        BigDecimal newPrice = BigDecimal.valueOf(15.0);
 
         mockMvc.perform(patch("/scooter-rental/tariffs/{tariffId}/set-new-price", tariffId)
                         .param("newPrice", newPrice.toString())
@@ -256,7 +256,7 @@ public class TariffControllerTest {
     @WithMockUser(roles = "ADMIN")
     void setNewPrice_ShouldReturn404_WhenTariffNotFound() throws Exception {
         Long tariffId = 1L;
-        BigDecimal newPrice = BigDecimal.valueOf(150.0);
+        BigDecimal newPrice = BigDecimal.valueOf(15.0);
 
         when(tariffService.setNewPrice(tariffId, newPrice)).thenThrow(new TariffNotFoundException());
 
@@ -273,7 +273,7 @@ public class TariffControllerTest {
     @WithMockUser(roles = "ADMIN")
     void setNewPrice_ShouldReturn400_WhenPriceIsNegative() throws Exception {
         Long tariffId = 1L;
-        BigDecimal newPrice = BigDecimal.valueOf(-150.0);
+        BigDecimal newPrice = BigDecimal.valueOf(-15.0);
 
         when(tariffService.setNewPrice(tariffId, newPrice)).thenThrow(new ValueLessZeroException());
 

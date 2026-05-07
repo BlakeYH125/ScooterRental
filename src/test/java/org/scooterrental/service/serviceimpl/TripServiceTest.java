@@ -97,7 +97,7 @@ public class TripServiceTest {
 
         Tariff tariff = new Tariff();
         tariff.setTariffId(tariffId);
-        tariff.setPaymentType(PaymentType.HOURLY);
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
 
         Trip trip = new Trip();
         trip.setTripId(tripId);
@@ -395,7 +395,7 @@ public class TripServiceTest {
 
         Tariff tariff = new Tariff();
         tariff.setTariffId(tariffId);
-        tariff.setPaymentType(PaymentType.HOURLY);
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
 
         when(userDao.findUserById(userId)).thenReturn(user);
         when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
@@ -427,7 +427,7 @@ public class TripServiceTest {
 
         Tariff tariff = new Tariff();
         tariff.setTariffId(tariffId);
-        tariff.setPaymentType(PaymentType.HOURLY);
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
 
         Scooter scooter = new Scooter();
         scooter.setScooterStatus(ScooterStatus.IN_RENT);
@@ -555,7 +555,7 @@ public class TripServiceTest {
 
         Tariff tariff = new Tariff();
         tariff.setTariffId(tariffId);
-        tariff.setPaymentType(PaymentType.HOURLY);
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
 
         Scooter scooter = new Scooter();
         scooter.setScooterStatus(ScooterStatus.IN_RENT);

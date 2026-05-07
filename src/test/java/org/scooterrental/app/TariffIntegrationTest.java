@@ -29,8 +29,8 @@ public class TariffIntegrationTest extends IntegrationTestBase {
     void shouldCreateTariff() throws Exception {
         String body = """
                 {
-                    "paymentType": "HOURLY",
-                    "price": 500,
+                    "paymentType": "PER_MINUTE",
+                    "price": 5,
                     "discount": 0
                 }
                 """;
@@ -38,8 +38,8 @@ public class TariffIntegrationTest extends IntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.paymentType").value("HOURLY"))
-                .andExpect(jsonPath("$.price").value(500));
+                .andExpect(jsonPath("$.paymentType").value("PER_MINUTE"))
+                .andExpect(jsonPath("$.price").value(5));
     }
 
     @Test
@@ -47,8 +47,8 @@ public class TariffIntegrationTest extends IntegrationTestBase {
     void shouldThrowForbiddenStatusWhenAddTariff() throws Exception {
         String body = """
                 {
-                    "paymentType": "HOURLY",
-                    "price": 500,
+                    "paymentType": "PER_MINUTE",
+                    "price": 5,
                     "discount": 0
                 }
                 """;
@@ -74,8 +74,8 @@ public class TariffIntegrationTest extends IntegrationTestBase {
     @WithMockUser(roles = "ADMIN")
     void shouldUpdatePaymentType() throws Exception {
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariffDao.create(tariff);
         Long generatedId = tariff.getTariffId();
 
@@ -89,22 +89,22 @@ public class TariffIntegrationTest extends IntegrationTestBase {
     @WithMockUser(roles = "ADMIN")
     void shouldUpdatePrice() throws Exception {
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariffDao.create(tariff);
         Long generatedId = tariff.getTariffId();
 
         mockMvc.perform(patch("/scooter-rental/tariffs/" + generatedId + "/set-new-price")
-                        .param("newPrice", "700"))
+                        .param("newPrice", "7"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.price").value(700));
+                .andExpect(jsonPath("$.price").value(7));
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void shouldThrowTariffNotFoundException() throws Exception {
         mockMvc.perform(patch("/scooter-rental/tariffs/" + 9999L + "/set-new-price")
-                        .param("newPrice", "700"))
+                        .param("newPrice", "7"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.type").value("TariffNotFoundException"));
     }
@@ -113,8 +113,8 @@ public class TariffIntegrationTest extends IntegrationTestBase {
     @WithMockUser(roles = "ADMIN")
     void shouldUpdateDiscount() throws Exception {
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariff.setDiscount(0);
         tariffDao.create(tariff);
         Long generatedId = tariff.getTariffId();
@@ -129,14 +129,14 @@ public class TariffIntegrationTest extends IntegrationTestBase {
     @WithMockUser(roles = "USER")
     void shouldReturnDto() throws Exception {
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariffDao.create(tariff);
         Long generatedId = tariff.getTariffId();
 
         mockMvc.perform(get("/scooter-rental/tariffs/" + generatedId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.price").value(500));
+                .andExpect(jsonPath("$.price").value(5));
     }
 
     @Test
@@ -149,12 +149,12 @@ public class TariffIntegrationTest extends IntegrationTestBase {
     @WithMockUser(roles = "USER")
     void shouldReturnListDto() throws Exception {
         Tariff tariff = new Tariff();
-        tariff.setPaymentType(PaymentType.HOURLY);
-        tariff.setPrice(new BigDecimal(500));
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
         tariffDao.create(tariff);
 
         mockMvc.perform(get("/scooter-rental/tariffs"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].price").value(500));
+                .andExpect(jsonPath("$[0].price").value(5));
     }
 }
