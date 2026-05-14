@@ -19,6 +19,7 @@ public interface TripMapper {
     @Mapping(source = "tariff.tariffId", target = "tariffId")
     TripResponseDto toTripDto(Trip trip);
 
+    @Mapping(target = "mileage", constant = "0.0")
     @Mapping(source = "user", target = "user")
     @Mapping(source = "scooter", target = "scooter")
     @Mapping(source = "tariff", target = "tariff")

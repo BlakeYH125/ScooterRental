@@ -132,6 +132,9 @@ public class TripServiceImpl implements TripService {
         if (tariff.getPaymentType() == PaymentType.PER_MINUTE) {
             totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeMinutes)).multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
         }
+        else if (tariff.getPaymentType() == PaymentType.SEASON_TICKET) {
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
+        }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndPoint(endRentalPoint);
         trip.setEndTime(endTime);
@@ -164,6 +167,9 @@ public class TripServiceImpl implements TripService {
         BigDecimal totalCost = BigDecimal.ZERO;
         if (tariff.getPaymentType() == PaymentType.PER_MINUTE) {
             totalCost = tariff.getPrice().multiply(BigDecimal.valueOf(tripTimeMinutes)).multiply(BigDecimal.valueOf(((100 - tariff.getDiscount()) / 100.0)));
+        }
+        else if (tariff.getPaymentType() == PaymentType.SEASON_TICKET) {
+            totalCost = tariff.getPrice().multiply(BigDecimal.valueOf((100 - tariff.getDiscount()) / 100.0));
         }
         trip.setTripStatus(TripStatus.COMPLETED);
         trip.setEndTime(endTime);
