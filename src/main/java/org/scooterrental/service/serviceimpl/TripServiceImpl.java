@@ -87,8 +87,10 @@ public class TripServiceImpl implements TripService {
         if (tariff == null) {
             throw new TariffNotFoundException();
         }
-        if (tariff.getPaymentType() == PaymentType.SEASON_TICKET && user.getSeasonTicketEndDate() == null) {
-            throw new UserHasNoActiveSeasonTicketException();
+        if (tariff.getPaymentType() == PaymentType.SEASON_TICKET) {
+            if (user.getSeasonTicketEndDate() == null || user.getSeasonTicketEndDate().isBefore(LocalDateTime.now())) {
+                throw new UserHasNoActiveSeasonTicketException();
+            }
         }
         if (tripDao.isThereActiveTripByUserId(userId)) {
             throw new UserAlreadyHasActiveTripException();
