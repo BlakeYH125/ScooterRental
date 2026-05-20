@@ -1,10 +1,13 @@
 package org.scooterrental.controller.advice;
 
 import org.scooterrental.model.exception.InvalidHierarchyException;
+import org.scooterrental.model.exception.RentalPointDeletedException;
+import org.scooterrental.model.exception.RentalPointHasChildrenException;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
 import org.scooterrental.model.exception.RentalPointAlreadyExistsException;
 import org.scooterrental.model.exception.SameRentalPointsIDException;
+import org.scooterrental.model.exception.ScooterDeletedException;
 import org.scooterrental.model.exception.ScooterNotFoundException;
 import org.scooterrental.model.exception.ScooterNotAvailableException;
 import org.scooterrental.model.exception.ScooterAlreadyInRentException;
@@ -102,7 +105,8 @@ public class GlobalExceptionHandler {
             ScooterNotAvailableException.class,
             TripAlreadyCompletedException.class,
             UserHasNoActiveSeasonTicketException.class,
-            UserAlreadyHasActiveTripException.class})
+            UserAlreadyHasActiveTripException.class,
+            RentalPointHasChildrenException.class})
     public ResponseEntity<Map<String, String>> handleConflictException(RuntimeException e) {
         return buildResponse(HttpStatus.CONFLICT, e.getMessage(), e);
     }
@@ -133,7 +137,9 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException.class,
             LowBatteryLevelException.class,
             UserNotBannedException.class,
-            InvalidHierarchyException.class})
+            InvalidHierarchyException.class,
+            RentalPointDeletedException.class,
+            ScooterDeletedException.class})
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(RuntimeException e) {
         return buildResponse(HttpStatus.BAD_REQUEST, e.getMessage(), e);
     }

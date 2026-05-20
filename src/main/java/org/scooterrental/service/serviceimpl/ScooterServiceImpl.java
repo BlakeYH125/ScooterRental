@@ -6,7 +6,9 @@ import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.exception.InvalidHierarchyException;
+import org.scooterrental.model.exception.RentalPointDeletedException;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
+import org.scooterrental.model.exception.ScooterDeletedException;
 import org.scooterrental.model.exception.ScooterNotFoundException;
 import org.scooterrental.model.exception.ScooterAlreadyInRentException;
 import org.scooterrental.model.exception.ScooterInWarehouseException;
@@ -44,6 +46,9 @@ public class ScooterServiceImpl implements ScooterService {
     @Override
     public ScooterResponseDto setNewScooterModel(Long scooterId, String newScooterModel) {
         Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.isDeleted()) {
+            throw new ScooterDeletedException();
+        }
         scooter.setModel(newScooterModel);
         scooterDao.update(scooter);
         logger.info("Самокату {} успешно установлена новая модель", scooterId);
@@ -53,6 +58,9 @@ public class ScooterServiceImpl implements ScooterService {
     @Override
     public ScooterResponseDto setNewBatteryLevel(Long scooterId, int newBatteryLevel) {
         Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.isDeleted()) {
+            throw new ScooterDeletedException();
+        }
         if (newBatteryLevel < 0 || newBatteryLevel > 100) {
             throw new IllegalArgumentException("Процент заряда не может выходить за диапазон 0-100");
         }
@@ -65,6 +73,9 @@ public class ScooterServiceImpl implements ScooterService {
     @Override
     public ScooterResponseDto rechargeBattery(Long scooterId) {
         Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.isDeleted()) {
+            throw new ScooterDeletedException();
+        }
         scooter.setBatteryLevel(100);
         scooterDao.update(scooter);
         logger.info("Самокат {} успешно перезаряжен", scooterId);
@@ -74,6 +85,9 @@ public class ScooterServiceImpl implements ScooterService {
     @Override
     public ScooterResponseDto putScooterInUse(Long scooterId, Long rentalPointId) {
         Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.isDeleted()) {
+            throw new ScooterDeletedException();
+        }
         if (scooter.getBatteryLevel() <= 5) {
             throw new LowBatteryLevelException();
         }
@@ -83,6 +97,9 @@ public class ScooterServiceImpl implements ScooterService {
         RentalPoint rentalPoint = rentalPointDao.findRentalPointById(rentalPointId);
         if (rentalPoint == null) {
             throw new RentalPointNotFoundException();
+        }
+        if (rentalPoint.isDeleted()) {
+            throw new RentalPointDeletedException();
         }
         if (rentalPoint.getRentalPointType() != RentalPointType.BUILDING) {
             throw new InvalidHierarchyException("Самокат можно оставить только у здания");
@@ -97,6 +114,9 @@ public class ScooterServiceImpl implements ScooterService {
     @Override
     public ScooterResponseDto putScooterInWarehouse(Long scooterId) {
         Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.isDeleted()) {
+            throw new ScooterDeletedException();
+        }
         if (scooter.getScooterStatus() == ScooterStatus.IN_WAREHOUSE) {
             throw new ScooterInWarehouseException();
         }
@@ -113,6 +133,9 @@ public class ScooterServiceImpl implements ScooterService {
     @Override
     public ScooterResponseDto setNewScooterStatus(Long scooterId, ScooterStatus newScooterStatus) {
         Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.isDeleted()) {
+            throw new ScooterDeletedException();
+        }
         if (scooter.getScooterStatus() == ScooterStatus.IN_RENT && newScooterStatus == ScooterStatus.IN_WAREHOUSE) {
             throw new ScooterAlreadyInRentException();
         }
@@ -127,6 +150,10 @@ public class ScooterServiceImpl implements ScooterService {
 
     @Override
     public void deleteScooter(Long scooterId) {
+        Scooter scooter = getScooterOrThrow(scooterId);
+        if (scooter.getScooterStatus() == ScooterStatus.IN_RENT) {
+            throw new ScooterAlreadyInRentException();
+        }
         if (!scooterDao.delete(scooterId)) {
             throw new RuntimeException("Ошибка при удалении");
         }

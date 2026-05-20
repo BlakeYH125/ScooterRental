@@ -438,7 +438,12 @@ public class ScooterServiceTest {
     void deleteScooter_ShouldDeleteScooter_WhenAllCorrect() {
         Long scooterId = 1L;
 
+        Scooter scooter = new Scooter();
+        scooter.setScooterId(scooterId);
+        scooter.setScooterStatus(ScooterStatus.IN_SERVICE);
+
         when(scooterDao.delete(scooterId)).thenReturn(true);
+        when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
 
         scooterService.deleteScooter(scooterId);
 
@@ -449,11 +454,12 @@ public class ScooterServiceTest {
     void deleteScooter_ShouldThrowRuntimeException_WhenWasNotDelete() {
         Long scooterId = 1L;
 
-        when(scooterDao.delete(scooterId)).thenReturn(false);
+        when(scooterDao.findScooter(scooterId)).thenReturn(null);
 
-        assertThrows(RuntimeException.class, () -> scooterService.deleteScooter(scooterId));
+        assertThrows(ScooterNotFoundException.class, () -> scooterService.deleteScooter(scooterId));
 
-        verify(scooterDao, times(1)).delete(scooterId);
+        verify(scooterDao, times(1)).findScooter(scooterId);
+        verify(scooterDao, never()).delete(scooterId);
     }
 
     @Test

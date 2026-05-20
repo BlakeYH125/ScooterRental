@@ -12,7 +12,9 @@ import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.model.enums.TripStatus;
 import org.scooterrental.model.exception.InvalidHierarchyException;
+import org.scooterrental.model.exception.RentalPointDeletedException;
 import org.scooterrental.model.exception.RentalPointNotFoundException;
+import org.scooterrental.model.exception.ScooterDeletedException;
 import org.scooterrental.model.exception.ScooterNotFoundException;
 import org.scooterrental.model.exception.ScooterNotAvailableException;
 import org.scooterrental.model.exception.UserBannedException;
@@ -77,6 +79,9 @@ public class TripServiceImpl implements TripService {
         if (scooter == null) {
             throw new ScooterNotFoundException();
         }
+        if (scooter.isDeleted()) {
+            throw new ScooterDeletedException();
+        }
         if (scooter.getScooterStatus() != ScooterStatus.AVAILABLE) {
             throw new ScooterNotAvailableException();
         }
@@ -118,6 +123,9 @@ public class TripServiceImpl implements TripService {
         RentalPoint endRentalPoint = rentalPointDao.findRentalPointById(endRentalPointId);
         if (endRentalPoint == null) {
             throw new RentalPointNotFoundException();
+        }
+        if (endRentalPoint.isDeleted()) {
+            throw new RentalPointDeletedException();
         }
         if (endRentalPoint.getRentalPointType() != RentalPointType.BUILDING) {
             throw new InvalidHierarchyException("Завершить аренду можно только у здания");

@@ -3,6 +3,8 @@ package org.scooterrental.service.serviceimpl;
 import lombok.RequiredArgsConstructor;
 import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.exception.InvalidHierarchyException;
+import org.scooterrental.model.exception.RentalPointDeletedException;
+import org.scooterrental.model.exception.RentalPointHasChildrenException;
 import org.scooterrental.model.exception.RentalPointNotEmptyException;
 import org.scooterrental.repository.daointerface.ScooterDao;
 import org.scooterrental.service.dto.RentalPointDetailsDto;
@@ -41,6 +43,9 @@ public class RentalPointServiceImpl implements RentalPointService {
         Long parentPointId = rentalPointCreateDto.getParentPointId();
         if (parentPointId != null) {
             parentPoint = getRentalPointOrThrow(parentPointId);
+            if (parentPoint.isDeleted()) {
+                throw new RentalPointDeletedException();
+            }
         }
         RentalPoint rentalPoint = rentalPointMapper.toRentalPointEntity(rentalPointCreateDto, parentPoint);
         rentalPointDao.create(rentalPoint);
@@ -51,6 +56,9 @@ public class RentalPointServiceImpl implements RentalPointService {
     @Override
     public RentalPointResponseDto setNewRentalPointLocation(Long rentalPointId, String newLocation) {
         RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
+        if (rentalPoint.isDeleted()) {
+            throw new RentalPointDeletedException();
+        }
         rentalPoint.setLocation(newLocation);
         rentalPointDao.update(rentalPoint);
         logger.info("Точке аренды {} успешно установлена новая локация", rentalPointId);
@@ -60,7 +68,13 @@ public class RentalPointServiceImpl implements RentalPointService {
     @Override
     public RentalPointResponseDto setNewParentPointId(Long rentalPointId, Long newParentPointId) {
         RentalPoint newParentPoint = getRentalPointOrThrow(newParentPointId);
+        if (newParentPoint.isDeleted()) {
+            throw new RentalPointDeletedException();
+        }
         RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
+        if (rentalPoint.isDeleted()) {
+            throw new RentalPointDeletedException();
+        }
         validateHierarchy(rentalPoint.getRentalPointType(), newParentPointId);
         if (rentalPointId.equals(newParentPointId)) {
             throw new SameRentalPointsIDException();
@@ -76,6 +90,11 @@ public class RentalPointServiceImpl implements RentalPointService {
         RentalPoint rentalPoint = getRentalPointOrThrow(rentalPointId);
         if (scooterDao.countScootersAtRentalPoint(rentalPointId) > 0) {
             throw new RentalPointNotEmptyException();
+        }
+        boolean hasActiveChildren = rentalPoint.getChildPoints().stream()
+                .anyMatch(child -> !child.isDeleted());
+        if (hasActiveChildren) {
+            throw new RentalPointHasChildrenException();
         }
         if (!rentalPointDao.delete(rentalPointId)) {
             throw new RuntimeException("Ошибка при удалении");
