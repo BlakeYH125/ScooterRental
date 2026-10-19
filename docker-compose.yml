@@ -4,25 +4,30 @@ services:
     container_name: scooter_rental_db
     restart: always
     environment:
-      POSTGRES_DB: scooter_rental_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 15492815
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
     ports:
-      - "5434:5432"
+      - "${DATABASE_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
   app:
     build: .
     container_name: scooter_rental_app
     ports:
-      - "8080:8080"
+      - "${APP_PORT}:8080"
     depends_on:
       - postgres
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/scooter_rental_db
+      DATABASE_HOST: postgres
+      DATABASE_PORT: "5432"
+      APP_PORT: "8080"
+      LOG_FILE: /app/logs/scooter-rental.log
     volumes:
-      - ./logs:/app/logs
+      - "${LOGS_DIR}:/app/logs"
+
 volumes:
   postgres_data:
-
-

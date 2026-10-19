@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
@@ -20,7 +19,6 @@ import java.util.Properties;
 
 @Configuration(proxyBeanMethods = false)
 @ComponentScan("org.scooterrental")
-@PropertySource("classpath:application.properties")
 @EnableScheduling
 public class AppConfig {
 
