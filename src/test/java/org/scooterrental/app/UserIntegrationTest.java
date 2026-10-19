@@ -1,11 +1,16 @@
 package org.scooterrental.app;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.Test;
+import org.scooterrental.controller.advice.GlobalExceptionHandler;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.model.enums.BanReason;
 import org.scooterrental.model.enums.Role;
 import org.scooterrental.repository.daointerface.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -33,6 +41,12 @@ public class UserIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @Autowired
+    private GlobalExceptionHandler exceptionHandler;
 
     @Test
     void shouldChangeUserData() throws Exception {
@@ -470,5 +484,60 @@ public class UserIntegrationTest extends IntegrationTestBase {
                         .param("monthsCount", "3")
                         .with(authentication(auth)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldRejectUserWithOldVersion() {
+        User user = new User();
+        user.setUsername("version-user");
+        user.setPassword("password");
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setAge(20);
+        user.setBalance(new BigDecimal("100.00"));
+        user.setBanReason(BanReason.NONE);
+        user.setRole(Role.ROLE_USER);
+        userDao.create(user);
+
+        Session session = sessionFactory.getCurrentSession();
+        session.flush();
+        long oldVersion = user.getVersion();
+        session.evict(user);
+
+        User currentUser = userDao.findUserById(user.getUserId());
+        currentUser.setBalance(new BigDecimal("150.00"));
+        userDao.update(currentUser);
+        session.flush();
+
+        assertEquals(oldVersion + 1, currentUser.getVersion());
+
+        user.setBalance(new BigDecimal("130.00"));
+        assertThrows(OptimisticLockingFailureException.class, () -> userDao.update(user));
+    }
+
+    @Test
+    void shouldReturn409WhenDatabaseRejectsDuplicateUsername() {
+        User firstUser = new User();
+        firstUser.setUsername("unique-user");
+        firstUser.setPassword("password");
+        firstUser.setFirstName("First");
+        firstUser.setLastName("User");
+        firstUser.setAge(20);
+        firstUser.setRole(Role.ROLE_USER);
+        userDao.create(firstUser);
+        sessionFactory.getCurrentSession().flush();
+
+        User secondUser = new User();
+        secondUser.setUsername("unique-user");
+        secondUser.setPassword("password");
+        secondUser.setFirstName("Second");
+        secondUser.setLastName("User");
+        secondUser.setAge(20);
+        secondUser.setRole(Role.ROLE_USER);
+
+        DataIntegrityViolationException exception = assertThrows(DataIntegrityViolationException.class, () -> userDao.create(secondUser));
+
+        assertTrue(exception.getMostSpecificCause().getMessage().contains("uq_users_username"));
+        assertEquals(409, exceptionHandler.handleDataIntegrityViolation(exception).getStatusCode().value());
     }
 }

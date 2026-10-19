@@ -1,5 +1,8 @@
 package org.scooterrental.controller.advice;
 
+import jakarta.persistence.OptimisticLockException;
+import org.hibernate.StaleStateException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.scooterrental.model.exception.InvalidHierarchyException;
 import org.scooterrental.model.exception.RentalPointDeletedException;
 import org.scooterrental.model.exception.RentalPointHasChildrenException;
@@ -31,6 +34,8 @@ import org.scooterrental.model.exception.PasswordMismatchException;
 import org.scooterrental.model.exception.LowBatteryLevelException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -152,6 +157,30 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException(Exception e) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Отсутствует или некорректно сформировано тело запроса", e);
+    }
+
+    @ExceptionHandler({
+            OptimisticLockingFailureException.class,
+            OptimisticLockException.class,
+            StaleStateException.class
+    })
+    public ResponseEntity<Map<String, String>> handleConcurrentModificationException(Exception e) {
+        return buildResponse(HttpStatus.CONFLICT, "Ошибка записи, повторите запрос", e);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        Throwable cause = e;
+
+        while (cause != null) {
+            if (cause instanceof ConstraintViolationException violation
+                    && "uq_users_username".equals(violation.getConstraintName())) {
+                return buildResponse(HttpStatus.CONFLICT, "Пользователь с таким именем уже существует", e);
+            }
+            cause = cause.getCause();
+        }
+
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Внутренняя ошибка", e);
     }
 
     @ExceptionHandler(Exception.class)

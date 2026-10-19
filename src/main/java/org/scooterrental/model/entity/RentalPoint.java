@@ -3,6 +3,7 @@ package org.scooterrental.model.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
@@ -40,7 +41,7 @@ public class RentalPoint {
     @Column(name = "location", nullable = false)
     private String location;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_point_id")
     private RentalPoint parentPoint;
 

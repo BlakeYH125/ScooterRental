@@ -65,7 +65,7 @@ public class TripServiceImpl implements TripService {
         Long userId = tripCreateDto.getUserId();
         Long scooterId = tripCreateDto.getScooterId();
         Long tariffId = tripCreateDto.getTariffId();
-        User user = userDao.findUserById(userId);
+        User user = userDao.findUserByIdForUpdate(userId);
         if (user == null) {
             throw new UserNotFoundException();
         }
@@ -75,7 +75,10 @@ public class TripServiceImpl implements TripService {
         if (user.getBalance().compareTo(BigDecimal.ZERO) < 0) {
             throw new ValueLessZeroException("Невозможно начать поездку при отрицательном балансе");
         }
-        Scooter scooter = scooterDao.findScooter(scooterId);
+        if (tripDao.isThereActiveTripByUserId(userId)) {
+            throw new UserAlreadyHasActiveTripException();
+        }
+        Scooter scooter = scooterDao.findScooterForUpdate(scooterId);
         if (scooter == null) {
             throw new ScooterNotFoundException();
         }
@@ -96,9 +99,6 @@ public class TripServiceImpl implements TripService {
             if (user.getSeasonTicketEndDate() == null || user.getSeasonTicketEndDate().isBefore(LocalDateTime.now())) {
                 throw new UserHasNoActiveSeasonTicketException();
             }
-        }
-        if (tripDao.isThereActiveTripByUserId(userId)) {
-            throw new UserAlreadyHasActiveTripException();
         }
         scooter.setScooterStatus(ScooterStatus.IN_RENT);
         Trip trip = tripMapper.toTripEntity(tripCreateDto, user, scooter, tariff);

@@ -1,5 +1,6 @@
 package org.scooterrental.repository.daoimpl;
 
+import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.scooterrental.model.entity.Scooter;
 import org.scooterrental.repository.daointerface.ScooterDao;
@@ -60,5 +61,10 @@ public class ScooterDaoImpl implements ScooterDao {
                 .createQuery("FROM Scooter s WHERE s.rentalPoint.rentalPointId = :rentalPointId AND deleted = false", Scooter.class)
                 .setParameter("rentalPointId", rentalPointId)
                 .list();
+    }
+
+    @Override
+    public Scooter findScooterForUpdate(Long scooterId) {
+        return sessionFactory.getCurrentSession().get(Scooter.class, scooterId, LockMode.PESSIMISTIC_WRITE);
     }
 }

@@ -1,6 +1,7 @@
 package org.scooterrental.model.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,7 +41,7 @@ public class Scooter {
     @Enumerated(EnumType.STRING)
     private ScooterStatus scooterStatus = ScooterStatus.IN_WAREHOUSE;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_point_id")
     private RentalPoint rentalPoint = null;
 
@@ -48,4 +50,8 @@ public class Scooter {
 
     @Column(name = "mileage", nullable = false)
     private double mileage = 0.0;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 }

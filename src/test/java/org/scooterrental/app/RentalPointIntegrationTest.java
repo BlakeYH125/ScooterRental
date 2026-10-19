@@ -1,14 +1,23 @@
 package org.scooterrental.app;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.repository.daointerface.RentalPointDao;
+import org.scooterrental.service.serviceimpl.simulation.BatterySimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,6 +34,12 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private RentalPointDao rentalPointDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @MockBean
+    private BatterySimulationService batterySimulationService;
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -236,5 +251,95 @@ public class RentalPointIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].location").value("ул. Пушкина, д. 10"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void shouldReturnRentalStationsInPagesWithoutDeletedBuildings() throws Exception {
+        RentalPoint city = new RentalPoint();
+        city.setLocation("Москва");
+        city.setRentalPointType(RentalPointType.CITY);
+        rentalPointDao.create(city);
+
+        RentalPoint district = new RentalPoint();
+        district.setLocation("ЦАО");
+        district.setRentalPointType(RentalPointType.DISTRICT);
+        district.setParentPoint(city);
+        rentalPointDao.create(district);
+
+        RentalPoint street = new RentalPoint();
+        street.setLocation("ул. Пушкина");
+        street.setRentalPointType(RentalPointType.STREET);
+        street.setParentPoint(district);
+        rentalPointDao.create(street);
+
+        List<Long> buildingIds = new ArrayList<>();
+        for (int i = 1; i <= 4; i++) {
+            RentalPoint building = new RentalPoint();
+            building.setLocation(String.valueOf(i));
+            building.setRentalPointType(RentalPointType.BUILDING);
+            building.setParentPoint(street);
+            building.setDeleted(i == 4);
+            rentalPointDao.create(building);
+            buildingIds.add(building.getRentalPointId());
+        }
+
+        Session session = sessionFactory.getCurrentSession();
+        session.flush();
+        session.clear();
+
+        Statistics statistics = sessionFactory.getStatistics();
+        boolean wasEnabled = statistics.isStatisticsEnabled();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        try {
+            mockMvc.perform(get("/scooter-rental/rental-points/{id}/rental-stations", city.getRentalPointId())
+                            .param("page", "0").param("size", "2"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(2))
+                    .andExpect(jsonPath("$[0].rentalPointId").value(buildingIds.get(0)))
+                    .andExpect(jsonPath("$[1].rentalPointId").value(buildingIds.get(1)))
+                    .andExpect(jsonPath("$[0].location").value("ул. Пушкина, 1"));
+
+            assertEquals(2, statistics.getPrepareStatementCount());
+        } finally {
+            statistics.setStatisticsEnabled(wasEnabled);
+        }
+
+        mockMvc.perform(get("/scooter-rental/rental-points/{id}/rental-stations", city.getRentalPointId())
+                        .param("page", "1").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].rentalPointId").value(buildingIds.get(2)));
+
+        mockMvc.perform(get("/scooter-rental/rental-points/{id}/rental-stations", city.getRentalPointId())
+                        .param("page", "2").param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void shouldReturn400WhenPageIsNegative() throws Exception {
+        mockMvc.perform(get("/scooter-rental/rental-points/1/rental-stations")
+                        .param("page", "-1").param("size", "50"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void shouldReturn400WhenPageSizeIsZero() throws Exception {
+        mockMvc.perform(get("/scooter-rental/rental-points/1/rental-stations")
+                        .param("page", "0").param("size", "0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void shouldReturn400WhenPageSizeIsTooLarge() throws Exception {
+        mockMvc.perform(get("/scooter-rental/rental-points/1/rental-stations")
+                        .param("page", "0").param("size", "101"))
+                .andExpect(status().isBadRequest());
     }
 }

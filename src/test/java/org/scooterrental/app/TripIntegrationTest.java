@@ -1,5 +1,8 @@
 package org.scooterrental.app;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
@@ -17,7 +20,10 @@ import org.scooterrental.repository.daointerface.ScooterDao;
 import org.scooterrental.repository.daointerface.TariffDao;
 import org.scooterrental.repository.daointerface.TripDao;
 import org.scooterrental.repository.daointerface.UserDao;
+import org.scooterrental.service.serviceimpl.simulation.BatterySimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,6 +34,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -54,6 +62,13 @@ public class TripIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private RentalPointDao rentalPointDao;
+
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @MockBean
+    private BatterySimulationService batterySimulationService;
 
     @Test
     void shouldStartTrip() throws Exception {
@@ -452,5 +467,123 @@ public class TripIntegrationTest extends IntegrationTestBase {
         mockMvc.perform(get("/scooter-rental/trips/scooter-history/" + scooter.getScooterId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].tripStatus").value("ACTIVE"));
+    }
+
+    @Test
+    void shouldRejectTripWithOldVersion() {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("password");
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setAge(20);
+        user.setBalance(new BigDecimal(1000));
+        user.setBanReason(BanReason.NONE);
+        user.setRole(Role.ROLE_USER);
+        userDao.create(user);
+
+        RentalPoint point = new RentalPoint();
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
+        rentalPointDao.create(point);
+
+        Scooter scooter = new Scooter();
+        scooter.setModel("Ninebot");
+        scooter.setBatteryLevel(100);
+        scooter.setScooterStatus(ScooterStatus.IN_RENT);
+        scooterDao.create(scooter);
+
+        Tariff tariff = new Tariff();
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
+        tariff.setDiscount(0);
+        tariffDao.create(tariff);
+
+        Trip trip = new Trip();
+        trip.setUser(user);
+        trip.setScooter(scooter);
+        trip.setStartPoint(point);
+        trip.setStartTime(LocalDateTime.now().minusMinutes(30));
+        trip.setTariff(tariff);
+        trip.setTripStatus(TripStatus.ACTIVE);
+        tripDao.create(trip);
+
+        Session session = sessionFactory.getCurrentSession();
+        session.flush();
+        long oldVersion = trip.getVersion();
+        session.evict(trip);
+
+        Trip currentTrip = tripDao.findTrip(trip.getTripId());
+        currentTrip.setTotalCost(new BigDecimal("10.00"));
+        tripDao.update(currentTrip);
+        session.flush();
+
+        assertEquals(oldVersion + 1, currentTrip.getVersion());
+
+        trip.setTotalCost(new BigDecimal("20.00"));
+        assertThrows(OptimisticLockingFailureException.class, () -> tripDao.update(trip));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void shouldReturnTripListWithOneSql() throws Exception {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("password");
+        user.setFirstName("Test");
+        user.setLastName("User");
+        user.setAge(20);
+        user.setBalance(new BigDecimal(1000));
+        user.setBanReason(BanReason.NONE);
+        user.setRole(Role.ROLE_USER);
+        userDao.create(user);
+
+        RentalPoint point = new RentalPoint();
+        point.setLocation("5");
+        point.setRentalPointType(RentalPointType.BUILDING);
+        rentalPointDao.create(point);
+
+        Scooter scooter = new Scooter();
+        scooter.setModel("Ninebot");
+        scooter.setBatteryLevel(100);
+        scooter.setScooterStatus(ScooterStatus.IN_RENT);
+        scooterDao.create(scooter);
+
+        Tariff tariff = new Tariff();
+        tariff.setPaymentType(PaymentType.PER_MINUTE);
+        tariff.setPrice(new BigDecimal(5));
+        tariff.setDiscount(0);
+        tariffDao.create(tariff);
+
+        Trip trip = new Trip();
+        trip.setUser(user);
+        trip.setScooter(scooter);
+        trip.setStartPoint(point);
+        trip.setStartTime(LocalDateTime.now().minusMinutes(30));
+        trip.setTariff(tariff);
+        trip.setTripStatus(TripStatus.ACTIVE);
+        tripDao.create(trip);
+
+        Session session = sessionFactory.getCurrentSession();
+        session.flush();
+        session.clear();
+
+        Statistics statistics = sessionFactory.getStatistics();
+        boolean wasEnabled = statistics.isStatisticsEnabled();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        try {
+            mockMvc.perform(get("/scooter-rental/trips"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$[0].tripStatus").value("ACTIVE"))
+                    .andExpect(jsonPath("$[0].userId").exists())
+                    .andExpect(jsonPath("$[0].scooterId").exists())
+                    .andExpect(jsonPath("$[0].startPointId").exists());
+
+            assertEquals(1, statistics.getPrepareStatementCount());
+        } finally {
+            statistics.setStatisticsEnabled(wasEnabled);
+        }
     }
 }

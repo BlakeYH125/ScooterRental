@@ -10,4 +10,5 @@ public interface UserDao {
     User findUserById(Long userId);
     User findUserByUsername(String username);
     List<User> findUsers();
+    User findUserByIdForUpdate(Long userId);
 }

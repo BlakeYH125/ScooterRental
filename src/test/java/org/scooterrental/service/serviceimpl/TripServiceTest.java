@@ -117,8 +117,8 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setUserId(userId);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
+        when(scooterDao.findScooterForUpdate(scooterId)).thenReturn(scooter);
         when(tariffDao.findTariff(tariffId)).thenReturn(tariff);
         when(tripMapper.toTripDto(any(Trip.class))).thenReturn(expected);
         when(tripDao.isThereActiveTripByUserId(userId)).thenReturn(false);
@@ -132,8 +132,8 @@ public class TripServiceTest {
         assertEquals(expected.getTariffId(), actual.getTariffId());
         assertEquals(expected.getUserId(), actual.getUserId());
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, times(1)).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, times(1)).findScooterForUpdate(scooterId);
         verify(tariffDao, times(1)).findTariff(tariffId);
         verify(tripDao, times(1)).create(any(Trip.class));
         verify(tripMapper, times(1)).toTripDto(any(Trip.class));
@@ -151,12 +151,12 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
 
-        when(userDao.findUserById(userId)).thenReturn(null);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(null);
 
         assertThrows(UserNotFoundException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, never()).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, never()).findScooterForUpdate(scooterId);
         verify(tariffDao, never()).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -178,12 +178,12 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
 
         assertThrows(UserBannedException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, never()).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, never()).findScooterForUpdate(scooterId);
         verify(tariffDao, never()).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -205,12 +205,12 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
 
         assertThrows(ValueLessZeroException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, never()).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, never()).findScooterForUpdate(scooterId);
         verify(tariffDao, never()).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -231,13 +231,13 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(scooterDao.findScooter(scooterId)).thenReturn(null);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
+        when(scooterDao.findScooterForUpdate(scooterId)).thenReturn(null);
 
         assertThrows(ScooterNotFoundException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, times(1)).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, times(1)).findScooterForUpdate(scooterId);
         verify(tariffDao, never()).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -262,13 +262,13 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
+        when(scooterDao.findScooterForUpdate(scooterId)).thenReturn(scooter);
 
         assertThrows(ScooterNotAvailableException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, times(1)).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, times(1)).findScooterForUpdate(scooterId);
         verify(tariffDao, never()).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -294,13 +294,13 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
+        when(scooterDao.findScooterForUpdate(scooterId)).thenReturn(scooter);
 
         assertThrows(LowBatteryLevelException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, times(1)).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, times(1)).findScooterForUpdate(scooterId);
         verify(tariffDao, never()).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -325,14 +325,14 @@ public class TripServiceTest {
         tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
+        when(scooterDao.findScooterForUpdate(scooterId)).thenReturn(scooter);
         when(tariffDao.findTariff(tariffId)).thenReturn(null);
 
         assertThrows(TariffNotFoundException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, times(1)).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, times(1)).findScooterForUpdate(scooterId);
         verify(tariffDao, times(1)).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -361,14 +361,14 @@ public class TripServiceTest {
         tariff.setTariffId(tariffId);
         tariff.setPaymentType(PaymentType.SEASON_TICKET);
 
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
+        when(scooterDao.findScooterForUpdate(scooterId)).thenReturn(scooter);
         when(tariffDao.findTariff(tariffId)).thenReturn(tariff);
 
         assertThrows(UserHasNoActiveSeasonTicketException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, times(1)).findScooter(scooterId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(scooterDao, times(1)).findScooterForUpdate(scooterId);
         verify(tariffDao, times(1)).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
@@ -379,34 +379,24 @@ public class TripServiceTest {
         Long userId = 1L;
         Long scooterId = 2L;
         Long tariffId = 3L;
-        Long tripId = 4L;
 
         User user = new User();
         user.setUserId(userId);
 
-        Scooter scooter = new Scooter();
-        scooter.setScooterId(scooterId);
-        scooter.setScooterStatus(ScooterStatus.AVAILABLE);
-
         TripCreateDto tripCreateDto = new TripCreateDto();
         tripCreateDto.setUserId(userId);
-        tripCreateDto.setTariffId(tariffId);
         tripCreateDto.setScooterId(scooterId);
+        tripCreateDto.setTariffId(tariffId);
 
-        Tariff tariff = new Tariff();
-        tariff.setTariffId(tariffId);
-        tariff.setPaymentType(PaymentType.PER_MINUTE);
-
-        when(userDao.findUserById(userId)).thenReturn(user);
-        when(scooterDao.findScooter(scooterId)).thenReturn(scooter);
-        when(tariffDao.findTariff(tariffId)).thenReturn(tariff);
+        when(userDao.findUserByIdForUpdate(userId)).thenReturn(user);
         when(tripDao.isThereActiveTripByUserId(userId)).thenReturn(true);
 
         assertThrows(UserAlreadyHasActiveTripException.class, () -> tripService.startTrip(tripCreateDto));
 
-        verify(userDao, times(1)).findUserById(userId);
-        verify(scooterDao, times(1)).findScooter(scooterId);
-        verify(tariffDao, times(1)).findTariff(tariffId);
+        verify(userDao, times(1)).findUserByIdForUpdate(userId);
+        verify(tripDao, times(1)).isThereActiveTripByUserId(userId);
+        verify(scooterDao, never()).findScooterForUpdate(scooterId);
+        verify(tariffDao, never()).findTariff(tariffId);
         verify(tripDao, never()).create(any(Trip.class));
         verify(tripMapper, never()).toTripDto(any(Trip.class));
     }

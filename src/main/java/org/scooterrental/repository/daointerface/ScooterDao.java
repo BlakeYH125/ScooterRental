@@ -12,4 +12,5 @@ public interface ScooterDao {
     List<Scooter> findScooters();
     Long countScootersAtRentalPoint(Long rentalPointId);
     List<Scooter> findScootersByRentalPoint(Long rentalPointId);
+    Scooter findScooterForUpdate(Long scooterId);
 }

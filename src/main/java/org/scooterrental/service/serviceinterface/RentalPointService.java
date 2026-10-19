@@ -14,5 +14,5 @@ public interface RentalPointService {
     RentalPointResponseDto getRentalPoint(Long rentalPointId);
     List<RentalPointResponseDto> getAllRentalPoints();
     RentalPointDetailsDto getRentalPointDetails(Long rentalPointId);
-    List<RentalPointResponseDto> getRentalStationsByParentId(Long rentalPointId);
+    List<RentalPointResponseDto> getRentalStationsByParentId(Long rentalPointId, int page, int size);
 }

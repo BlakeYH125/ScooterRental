@@ -1,6 +1,7 @@
 package org.scooterrental.model.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,11 +34,11 @@ public class Trip {
     @Column(name = "trip_id")
     private Long tripId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "scooter_id", nullable = false)
     private Scooter scooter;
 
@@ -44,11 +46,11 @@ public class Trip {
     @Enumerated(EnumType.STRING)
     private TripStatus tripStatus = TripStatus.ACTIVE;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "start_point_id", nullable = false)
     private RentalPoint startPoint;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "end_point_id")
     private RentalPoint endPoint;
 
@@ -64,7 +66,11 @@ public class Trip {
     @Column(name = "mileage", nullable = false)
     private double mileage = 0.0;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tariff_id", nullable = false)
     private Tariff tariff;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 }

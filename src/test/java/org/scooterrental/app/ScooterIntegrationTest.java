@@ -1,5 +1,8 @@
 package org.scooterrental.app;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.Test;
 import org.scooterrental.model.entity.RentalPoint;
 import org.scooterrental.model.entity.Scooter;
@@ -7,11 +10,16 @@ import org.scooterrental.model.enums.RentalPointType;
 import org.scooterrental.model.enums.ScooterStatus;
 import org.scooterrental.repository.daointerface.RentalPointDao;
 import org.scooterrental.repository.daointerface.ScooterDao;
+import org.scooterrental.service.serviceimpl.simulation.BatterySimulationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,6 +39,13 @@ public class ScooterIntegrationTest extends IntegrationTestBase {
 
     @Autowired
     private RentalPointDao rentalPointDao;
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @MockBean
+    private BatterySimulationService batterySimulationService;
+
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -222,4 +237,64 @@ public class ScooterIntegrationTest extends IntegrationTestBase {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].model").value("Ninebot Max"));
     }
+
+    @Test
+    void shouldRejectScooterWithOldVersion() {
+        Scooter scooter = new Scooter();
+        scooter.setModel("Ninebot");
+        scooter.setBatteryLevel(100);
+        scooterDao.create(scooter);
+
+        Session session = sessionFactory.getCurrentSession();
+        session.flush();
+        long oldVersion = scooter.getVersion();
+        session.evict(scooter);
+
+        Scooter currentScooter = scooterDao.findScooter(scooter.getScooterId());
+        currentScooter.setBatteryLevel(90);
+        scooterDao.update(currentScooter);
+        session.flush();
+
+        assertEquals(oldVersion + 1, currentScooter.getVersion());
+
+        scooter.setBatteryLevel(80);
+        assertThrows(OptimisticLockingFailureException.class, () -> scooterDao.update(scooter));
+    }
+
+    @Test
+    @WithMockUser(roles = "USER")
+    void shouldReturnScooterListWithOneSql() throws Exception {
+        for (int i = 0; i < 3; i++) {
+            RentalPoint point = new RentalPoint();
+            point.setLocation("Здание " + i);
+            point.setRentalPointType(RentalPointType.BUILDING);
+            rentalPointDao.create(point);
+
+            Scooter scooter = new Scooter();
+            scooter.setModel("Ninebot " + i);
+            scooter.setRentalPoint(point);
+            scooterDao.create(scooter);
+        }
+
+        Session session = sessionFactory.getCurrentSession();
+        session.flush();
+        session.clear();
+
+        Statistics statistics = sessionFactory.getStatistics();
+        boolean wasEnabled = statistics.isStatisticsEnabled();
+        statistics.setStatisticsEnabled(true);
+        statistics.clear();
+
+        try {
+            mockMvc.perform(get("/scooter-rental/scooters"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.length()").value(3))
+                    .andExpect(jsonPath("$[0].rentalPointId").exists());
+
+            assertEquals(1, statistics.getPrepareStatementCount());
+        } finally {
+            statistics.setStatisticsEnabled(wasEnabled);
+        }
+    }
+
 }

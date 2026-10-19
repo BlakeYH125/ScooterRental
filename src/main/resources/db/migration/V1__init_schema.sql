@@ -8,7 +8,9 @@ CREATE TABLE users (
     balance DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     role VARCHAR(20) NOT NULL,
     ban_reason VARCHAR(50) NOT NULL DEFAULT 'NONE',
-    season_ticket_end_date TIMESTAMP DEFAULT NULL
+    season_ticket_end_date TIMESTAMP DEFAULT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
+    CONSTRAINT uq_users_username UNIQUE (username)
 );
 
 CREATE TABLE tariffs (
@@ -38,6 +40,7 @@ CREATE TABLE scooters (
     rental_point_id BIGINT DEFAULT NULL,
     deleted BOOLEAN NOT NULL DEFAULT FALSE,
     mileage DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    version BIGINT NOT NULL DEFAULT 0,
 
     CONSTRAINT fk_scooters_rental_point
     FOREIGN KEY (rental_point_id)
@@ -56,6 +59,7 @@ CREATE TABLE trips (
     total_cost DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     mileage DOUBLE PRECISION NOT NULL DEFAULT 0.0,
     tariff_id BIGINT NOT NULL,
+    version BIGINT NOT NULL DEFAULT 0,
 
     CONSTRAINT fk_trips_users
     FOREIGN KEY (user_id)

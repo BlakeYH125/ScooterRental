@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
@@ -620,18 +621,22 @@ public class RentalPointControllerTest {
     @WithMockUser(roles = "USER")
     void getRentalStationsByParentId_ShouldReturn200AndList_WhenUserRequestsAndAllCorrect() throws Exception {
         Long rentalPointId = 1L;
+        int page = 1;
+        int size = 20;
         RentalPointResponseDto dto = new RentalPointResponseDto();
         dto.setRentalPointId(2L);
         dto.setLocation("ул. Пушкина, 10");
 
-        when(rentalPointService.getRentalStationsByParentId(rentalPointId)).thenReturn(List.of(dto));
+        when(rentalPointService.getRentalStationsByParentId(rentalPointId, page, size)).thenReturn(List.of(dto));
 
-        mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
+        mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].rentalPointId").value(2L))
                 .andExpect(jsonPath("$[0].location").value("ул. Пушкина, 10"));
 
-        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId);
+        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId, page, size);
     }
 
     @Test
@@ -642,14 +647,14 @@ public class RentalPointControllerTest {
         dto.setRentalPointId(2L);
         dto.setLocation("ул. Пушкина, 10");
 
-        when(rentalPointService.getRentalStationsByParentId(rentalPointId)).thenReturn(List.of(dto));
+        when(rentalPointService.getRentalStationsByParentId(rentalPointId, 0, 50)).thenReturn(List.of(dto));
 
         mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].rentalPointId").value(2L))
                 .andExpect(jsonPath("$[0].location").value("ул. Пушкина, 10"));
 
-        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId);
+        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId, 0, 50);
     }
 
     @Test
@@ -659,7 +664,7 @@ public class RentalPointControllerTest {
         mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
                 .andExpect(status().isUnauthorized());
 
-        verify(rentalPointService, never()).getRentalStationsByParentId(anyLong());
+        verify(rentalPointService, never()).getRentalStationsByParentId(anyLong(), anyInt(), anyInt());
     }
 
     @Test
@@ -667,12 +672,13 @@ public class RentalPointControllerTest {
     void getRentalStationsByParentId_ShouldReturn404_WhenRentalPointNotFound() throws Exception {
         Long rentalPointId = 1L;
 
-        when(rentalPointService.getRentalStationsByParentId(rentalPointId)).thenThrow(new RentalPointNotFoundException());
+        when(rentalPointService.getRentalStationsByParentId(rentalPointId, 0, 50))
+                .thenThrow(new RentalPointNotFoundException());
 
         mockMvc.perform(get("/scooter-rental/rental-points/{rentalPointId}/rental-stations", rentalPointId))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.type").value("RentalPointNotFoundException"));
 
-        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId);
+        verify(rentalPointService, times(1)).getRentalStationsByParentId(rentalPointId, 0, 50);
     }
 }

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -64,6 +65,10 @@ public class User implements UserDetails {
 
     @Column(name = "season_ticket_end_date")
     private LocalDateTime seasonTicketEndDate = null;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

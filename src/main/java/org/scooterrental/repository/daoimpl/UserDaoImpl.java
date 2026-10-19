@@ -1,5 +1,6 @@
 package org.scooterrental.repository.daoimpl;
 
+import org.hibernate.LockMode;
 import org.hibernate.SessionFactory;
 import org.scooterrental.model.entity.User;
 import org.scooterrental.repository.daointerface.UserDao;
@@ -39,5 +40,10 @@ public class UserDaoImpl implements UserDao {
     @Override
     public List<User> findUsers() {
         return sessionFactory.getCurrentSession().createQuery("FROM User", User.class).list();
+    }
+
+    @Override
+    public User findUserByIdForUpdate(Long userId) {
+        return sessionFactory.getCurrentSession().get(User.class, userId, LockMode.PESSIMISTIC_WRITE);
     }
 }

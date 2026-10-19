@@ -24,5 +24,6 @@ public interface TripMapper {
     @Mapping(source = "scooter", target = "scooter")
     @Mapping(source = "tariff", target = "tariff")
     @Mapping(source = "scooter.rentalPoint", target = "startPoint")
+    @Mapping(target = "version", ignore = true)
     Trip toTripEntity(TripCreateDto tripCreateDto, User user, Scooter scooter, Tariff tariff);
 }

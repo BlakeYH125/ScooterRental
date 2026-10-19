@@ -141,19 +141,29 @@ public class RentalPointServiceImpl implements RentalPointService {
     }
 
     @Override
-    public List<RentalPointResponseDto> getRentalStationsByParentId(Long parentPointId) {
+    public List<RentalPointResponseDto> getRentalStationsByParentId(Long parentPointId, int page, int size) {
+        if (page < 0 || size < 1 || size > 100) {
+            throw new IllegalArgumentException("Номер страницы должен быть от 0, размер — от 1 до 100");
+        }
+
+        long offset = (long) page * size;
+        if (offset > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Слишком большой номер страницы");
+        }
+
         RentalPoint startPoint = getRentalPointOrThrow(parentPointId);
-        List<RentalPoint> result = new ArrayList<>();
-        extractBuildings(startPoint, result);
-        logger.info("Информация о дочерних точках аренды {} успешно запрошена", parentPointId);
-        return result.stream()
-                .map(rentalPoint -> {
-                    RentalPointResponseDto rentalPointResponseDto = rentalPointMapper.toRentalPointDto(rentalPoint);
-                    if (rentalPoint.getParentPoint() != null) {
-                        String fullLocation = rentalPoint.getParentPoint().getLocation() + ", " + rentalPoint.getLocation();
-                        rentalPointResponseDto.setLocation(fullLocation);
+        if (startPoint.isDeleted()) {
+            return List.of();
+        }
+
+        return rentalPointDao.findBuildingsPage(parentPointId, startPoint.getRentalPointType(), (int) offset, size)
+                .stream()
+                .map(building -> {
+                    RentalPointResponseDto dto = rentalPointMapper.toRentalPointDto(building);
+                    if (building.getParentPoint() != null) {
+                        dto.setLocation(building.getParentPoint().getLocation() + ", " + building.getLocation());
                     }
-                    return rentalPointResponseDto;
+                    return dto;
                 })
                 .toList();
     }
