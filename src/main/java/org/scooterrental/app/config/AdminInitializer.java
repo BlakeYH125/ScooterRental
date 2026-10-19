@@ -31,17 +31,19 @@ public class AdminInitializer implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         List<User> users = userDao.findUsers();
+        if (!users.isEmpty()) {
+            return;
+        }
         if (adminUsername.isBlank() || adminPassword.isBlank()) {
             throw new IllegalStateException("Укажите ADMIN_USERNAME и ADMIN_PASSWORD в .env");
         }
-
-            User user = new User();
-            user.setUsername(adminUsername);
-            user.setFirstName("admin");
-            user.setLastName("admin");
-            user.setAge(1);
-            user.setPassword(passwordEncoder.encode(adminPassword));
-            user.setRole(Role.ROLE_ADMIN);
-            userDao.create(user);
+        User user = new User();
+        user.setUsername(adminUsername);
+        user.setFirstName("admin");
+        user.setLastName("admin");
+        user.setAge(1);
+        user.setPassword(passwordEncoder.encode(adminPassword));
+        user.setRole(Role.ROLE_ADMIN);
+        userDao.create(user);
     }
 }
